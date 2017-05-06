@@ -58,7 +58,9 @@ public class LoginActivity extends AppCompatActivity {
                         intent.putExtra("nusp", nusp);
                         startActivity(intent);
                     } else {
-                        // Link to TeacherHomeActivity
+                        Intent intent = new Intent(LoginActivity.this, TeacherHomeActivity.class);
+                        intent.putExtra("nusp", nusp);
+                        startActivity(intent);
                     }
                 } else {
                     if (!tryLoginAsTeacher) {
