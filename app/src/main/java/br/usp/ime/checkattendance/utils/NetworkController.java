@@ -108,4 +108,40 @@ public class NetworkController {
 
         RequestQueueSingleton.getInstance(context).addToRequestQueue(request);
     }
+
+    public void getAttendedSeminars(final String nusp, final Context context,
+                                    final ServerCallback callback) {
+
+        String url = "http://207.38.82.139:8001/attendence/listSeminars";
+
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        callback.onSuccess(response);
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onError();
+
+            }
+        }){
+            String body = "nusp=" + nusp;
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return body.getBytes();
+            }
+            @Override
+            public String getBodyContentType()
+            {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        RequestQueueSingleton.getInstance(context).addToRequestQueue(request);
+    }
 }

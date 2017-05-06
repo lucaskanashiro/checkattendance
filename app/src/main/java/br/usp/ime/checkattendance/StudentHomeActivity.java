@@ -25,6 +25,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import br.usp.ime.checkattendance.fragments.AttendedSeminarsFragment;
 import br.usp.ime.checkattendance.fragments.SeminarsFragment;
 import br.usp.ime.checkattendance.models.Seminar;
 import br.usp.ime.checkattendance.utils.NetworkController;
@@ -35,6 +36,7 @@ public class StudentHomeActivity extends AppCompatActivity {
 
     private String nusp;
     private String allSeminars;
+    private String attendedSeminars;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
     private TabLayout tabLayout;
@@ -65,12 +67,25 @@ public class StudentHomeActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        this.networkController.getAttendedSeminars(this.nusp, this, new ServerCallback() {
+            @Override
+            public void onSuccess(String response) {
+                attendedSeminars = response;
+            }
+
+            @Override
+            public void onError() {
+                String message = "Sorry, we cannot fetch seminars data";
+                Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void setupViewPager() {
         this.viewPager = (ViewPager) findViewById(R.id.viewpager);
         this.pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
-                StudentHomeActivity.this, this.allSeminars);
+                StudentHomeActivity.this, this.allSeminars, this.attendedSeminars);
         this.viewPager.setAdapter(pagerAdapter);
     }
 
@@ -88,11 +103,14 @@ public class StudentHomeActivity extends AppCompatActivity {
         String tabTitles[] = new String[] { "Attended Seminars", "All Seminars"};
         Context context;
         String seminars;
+        String attendedSeminars;
 
-        public PagerAdapter(FragmentManager fm, Context context, String seminars) {
+        public PagerAdapter(FragmentManager fm, Context context, String seminars,
+                            String attendedSeminars) {
             super(fm);
             this.context = context;
             this.seminars = seminars;
+            this.attendedSeminars = attendedSeminars;
         }
 
         @Override
@@ -105,11 +123,11 @@ public class StudentHomeActivity extends AppCompatActivity {
 
             switch (position) {
                 case 0:
-                    Fragment seminarFragment = new SeminarsFragment();
+                    Fragment attendedSeminarFragment = new AttendedSeminarsFragment();
                     Bundle args = new Bundle();
-                    args.putString("response", seminars);
-                    seminarFragment.setArguments(args);
-                    return seminarFragment;
+                    args.putString("response", attendedSeminars);
+                    attendedSeminarFragment.setArguments(args);
+                    return attendedSeminarFragment;
                 case 1:
                     Fragment seminarFragment2 = new SeminarsFragment();
                     Bundle args2 = new Bundle();

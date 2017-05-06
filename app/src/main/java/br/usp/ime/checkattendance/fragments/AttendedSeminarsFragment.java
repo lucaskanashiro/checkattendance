@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +40,7 @@ public class AttendedSeminarsFragment extends Fragment {
 
         Bundle args = getArguments();
         this.seminars = args.getString("response");
+        this.attendedSeminars = new ArrayList<Seminar>();
     }
 
     @Override
@@ -50,13 +52,16 @@ public class AttendedSeminarsFragment extends Fragment {
         RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view_attended);
         rv.setHasFixedSize(true);
 
-        try {
-            this.attendedSeminars = Parser.parseSeminars(this.seminars);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (this.seminars != null) {
+            try {
+                this.attendedSeminars = Parser.parseSeminars(this.seminars);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(getContext(), "You do not attended any seminar", Toast.LENGTH_LONG).show();
         }
 
-        Log.d("SEMINARS FRAGMENT", this.seminars.toString() + "\n");
         SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars);
         rv.setAdapter(adapter);
 
