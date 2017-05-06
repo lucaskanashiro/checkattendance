@@ -8,13 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,23 +16,21 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import br.usp.ime.checkattendance.R;
-import br.usp.ime.checkattendance.StudentHomeActivity;
 import br.usp.ime.checkattendance.adapters.SeminarAdapter;
 import br.usp.ime.checkattendance.models.Seminar;
 import br.usp.ime.checkattendance.utils.Parser;
-import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
 
 /**
  * Created by kanashiro on 5/6/17.
  */
 
-public class SeminarsFragment extends Fragment {
+public class AttendedSeminarsFragment extends Fragment {
 
-    private ArrayList<Seminar> seminars;
-    private String allSeminars;
+    private ArrayList<Seminar> attendedSeminars;
+    private String seminars;
 
-    public SeminarsFragment() {
-        this.seminars = new ArrayList<Seminar>();
+    public AttendedSeminarsFragment() {
+        this.attendedSeminars = new ArrayList<Seminar>();
     }
 
     @Override
@@ -47,26 +38,26 @@ public class SeminarsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        this.allSeminars = args.getString("response");
+        this.seminars = args.getString("response");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_seminars, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_attended_seminars, container, false);
 
-        RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
+        RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view_attended);
         rv.setHasFixedSize(true);
 
         try {
-            this.seminars = Parser.parseSeminars(this.allSeminars);
+            this.attendedSeminars = Parser.parseSeminars(this.seminars);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         Log.d("SEMINARS FRAGMENT", this.seminars.toString() + "\n");
-        SeminarAdapter adapter = new SeminarAdapter(this.seminars);
+        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars);
         rv.setAdapter(adapter);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
