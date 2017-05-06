@@ -18,7 +18,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
+import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -31,6 +33,8 @@ public class RegisterActivity extends AppCompatActivity {
     private String passwd;
     private String name;
     private boolean isStudent;
+    private NetworkController networkController;
+    private ServerCallback serverCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +48,9 @@ public class RegisterActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        this.networkController = new NetworkController();
         initializeUIComponents();
+        initializeCallback();
     }
 
     private void initializeUIComponents() {
@@ -52,6 +58,33 @@ public class RegisterActivity extends AppCompatActivity {
         this.mNuspEditText = (EditText) findViewById(R.id.et_nusp_register);
         this.mPasswdEditText = (EditText) findViewById(R.id.et_passwd_register);
         this.mTypeRadioGroup = (RadioGroup) findViewById(R.id.rg_type);
+    }
+
+    private void initializeCallback() {
+        this.serverCallback = new ServerCallback() {
+            @Override
+            public void onSuccess(String response) {
+                if (response.contains("\"success\":true")) {
+                    String type = (isStudent) ? "student" : "teacher";
+                    String message = "You are registered as new " + type;
+                    Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
+                    NavUtils.navigateUpFromSameTask(RegisterActivity.this);
+                } else {
+                    String message = "This NUSP is already registered";
+                    Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
+
+                    mNuspEditText.setText("");
+                    mPasswdEditText.setText("");
+                }
+            }
+
+            @Override
+            public void onError() {
+                String message = "We had some problem. Please, try again later";
+                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
+                NavUtils.navigateUpFromSameTask(RegisterActivity.this);
+            }
+        };
     }
 
     @Override
@@ -89,67 +122,14 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void registerStudent() {
         String url = "http://207.38.82.139:8001/student/add";
-        this.register(url, this.name, this.nusp, this.passwd);
+        this.networkController.register(url, this.name, this.nusp, this.passwd, this,
+                this.serverCallback);
     }
 
     private void registerTeacher() {
         String url = "http://207.38.82.139:8001/teacher/add";
-        this.register(url, this.name, this.nusp, this.passwd);
+        this.networkController.register(url, this.name, this.nusp, this.passwd, this,
+                this.serverCallback);
     }
 
-    private void register(String url, final String name, final String nusp,
-                          final String passwd) {
-
-        StringRequest request = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("REGISTER", response +  "\n");
-                        if (response.contains("\"success\":true")) {
-                            RegisterActivity.this.successedRegister();
-                        } else {
-                            RegisterActivity.this.failureRegister();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                RegisterActivity.this.failureRequest();
-            }
-        }
-        ) {
-            String body = "nusp=" + nusp + "&pass=" + passwd + "&name=" + name;
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return body.getBytes();
-            }
-            @Override
-            public String getBodyContentType() {
-                return "application/x-www-form-urlencoded; charset=UTF-8";
-            }
-        };
-
-        RequestQueueSingleton.getInstance(this).addToRequestQueue(request);
-    }
-
-    private void successedRegister() {
-        String type = (this.isStudent) ? "student" : "teacher";
-        String message = "You are registered as new " + type;
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        NavUtils.navigateUpFromSameTask(this);
-    }
-
-    private void failureRegister() {
-        String message = "This NUSP is already registered";
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-        this.mNuspEditText.setText("");
-        this.mPasswdEditText.setText("");
-    }
-
-    private void failureRequest() {
-        String message = "We had some problem. Please, try again later";
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        NavUtils.navigateUpFromSameTask(this);
-    }
 }
