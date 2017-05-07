@@ -1,9 +1,11 @@
 package br.usp.ime.checkattendance;
 
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,16 +26,19 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private String type;
     private String nusp_sent;
     private NetworkController networkController;
-
     private String current_name;
-    private String updated_name;
-    private String updated_nusp;
-    private String updated_passwd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
+
+        ActionBar actionBar = this.getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setTitle("Update Profile");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         getSentData();
         initializeUIComponents();
@@ -41,6 +46,16 @@ public class UpdateProfileActivity extends AppCompatActivity {
         this.networkController = new NetworkController();
 
         getCurrentData();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void getSentData() {
@@ -91,26 +106,38 @@ public class UpdateProfileActivity extends AppCompatActivity {
         nusp = this.mNuspEditText.getText().toString();
         passwd = this.mPasswdEditText.getText().toString();
 
-        this.networkController.updateStudentData(nusp, name, passwd, this, new ServerCallback() {
-            @Override
-            public void onSuccess(String response) {
-                if (response.contains("\"success\":true")) {
-                    String message = "Profile updated!";
-                    Toast.makeText(UpdateProfileActivity.this, message,Toast.LENGTH_LONG).show();
-                    UpdateProfileActivity.this.finish();
-                } else {
-                    String message = "Your profile was not updated. Try again later";
-                    Toast.makeText(UpdateProfileActivity.this, message,Toast.LENGTH_LONG).show();
-                    UpdateProfileActivity.this.finish();
-                }
-            }
+        if (name.matches("")) name = this.current_name;
+        if (nusp.matches("")) nusp = this.nusp_sent;
+        if (passwd.matches("")) {
+            String message = "You must provide a password to update your profile";
+            Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
+        } else {
 
-            @Override
-            public void onError() {
-                String message = "Your profile was not updated. Try again later";
-                Toast.makeText(UpdateProfileActivity.this, message,Toast.LENGTH_LONG).show();
-                UpdateProfileActivity.this.finish();
-            }
-        });
+            this.networkController.updateStudentData(nusp, name, passwd, this, new ServerCallback() {
+
+                        @Override
+                        public void onSuccess(String response) {
+                            if (response.contains("\"success\":true")) {
+                                String message = "Profile updated!";
+                                Toast.makeText(UpdateProfileActivity.this, message,
+                                        Toast.LENGTH_LONG).show();
+                                UpdateProfileActivity.this.finish();
+                            } else {
+                                String message = "Your profile was not updated. Try again later";
+                                Toast.makeText(UpdateProfileActivity.this, message,
+                                        Toast.LENGTH_LONG).show();
+                                UpdateProfileActivity.this.finish();
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
+                            String message = "Your profile was not updated. Try again later";
+                            Toast.makeText(UpdateProfileActivity.this, message,
+                                    Toast.LENGTH_LONG).show();
+                            UpdateProfileActivity.this.finish();
+                        }
+                    });
+        }
     }
 }
