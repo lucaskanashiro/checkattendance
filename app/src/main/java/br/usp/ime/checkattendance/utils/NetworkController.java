@@ -144,4 +144,69 @@ public class NetworkController {
 
         RequestQueueSingleton.getInstance(context).addToRequestQueue(request);
     }
+
+    public void getStudentData(final String nusp, final Context ctx, final ServerCallback callback){
+        String url = "http://207.38.82.139:8001/student/get/" + nusp;
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        callback.onSuccess(response);
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onError();
+
+            }
+        }){
+            @Override
+            public String getBodyContentType()
+            {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        RequestQueueSingleton.getInstance(ctx).addToRequestQueue(request);
+    }
+
+    public void updateStudentData(final String nusp, final String name, final String passwd,
+                                  final Context context, final ServerCallback callback) {
+
+        String url = "http://207.38.82.139:8001/student/edit";
+
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        callback.onSuccess(response);
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onError();
+
+            }
+        }){
+            String body = "nusp=" + nusp + "&name=" + name + "&pass=" + passwd;
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return body.getBytes();
+            }
+            @Override
+            public String getBodyContentType()
+            {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        RequestQueueSingleton.getInstance(context).addToRequestQueue(request);
+    }
 }

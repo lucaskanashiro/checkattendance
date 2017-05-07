@@ -59,7 +59,7 @@ public class AttendedSeminarsFragment extends Fragment {
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getContext(), "You do not attended any seminar", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "You did not attended any seminar", Toast.LENGTH_LONG).show();
         }
 
         SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars);

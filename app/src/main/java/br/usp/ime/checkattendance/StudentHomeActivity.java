@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,6 +99,26 @@ public class StudentHomeActivity extends AppCompatActivity {
             TabLayout.Tab tab = this.tabLayout.getTabAt(i);
             tab.setCustomView(this.pagerAdapter.getTabView(i));
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.student_home, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.student_edit_profile) {
+            Intent intent = new Intent(StudentHomeActivity.this, UpdateProfileActivity.class);
+            intent.putExtra("nusp", this.nusp);
+            intent.putExtra("type", "student");
+            startActivity(intent);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     class PagerAdapter extends FragmentPagerAdapter {

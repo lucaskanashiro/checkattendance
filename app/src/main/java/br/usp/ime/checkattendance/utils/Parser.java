@@ -29,4 +29,9 @@ public class Parser {
         return seminars;
     }
 
+    public static String parseData(String response, String field) throws JSONException {
+        JSONObject json = new JSONObject(response);
+        JSONObject data = json.getJSONObject("data");
+        return data.getString(field);
+    }
 }
