@@ -52,16 +52,20 @@ public class LoginActivity extends AppCompatActivity {
                     String type = (!tryLoginAsTeacher) ? "student" : "teacher";
                     String message = "You are logged in as " + type;
                     Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                    Intent intent;
 
                     if (type.equals("student")) {
-                        Intent intent = new Intent(LoginActivity.this, StudentHomeActivity.class);
-                        intent.putExtra("nusp", nusp);
-                        startActivity(intent);
+                        intent = new Intent(LoginActivity.this, StudentHomeActivity.class);
                     } else {
-                        Intent intent = new Intent(LoginActivity.this, TeacherHomeActivity.class);
-                        intent.putExtra("nusp", nusp);
-                        startActivity(intent);
+                        intent = new Intent(LoginActivity.this, TeacherHomeActivity.class);
                     }
+
+                    intent.putExtra("nusp", nusp);
+                    startActivity(intent);
+
+                    mPasswdEditText.setText("");
+                    mNuspEditText.setText("");
+
                 } else {
                     if (!tryLoginAsTeacher) {
                         tryLoginAsTeacher = true;

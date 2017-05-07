@@ -116,6 +116,8 @@ public class StudentHomeActivity extends AppCompatActivity {
             intent.putExtra("nusp", this.nusp);
             intent.putExtra("type", "student");
             startActivity(intent);
+        } else if (id == R.id.student_logout) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
