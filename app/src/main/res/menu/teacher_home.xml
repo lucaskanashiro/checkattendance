@@ -7,4 +7,10 @@
         app:showAsAction="never"
         android:orderInCategory="100"
         android:title="Register Teacher" />
+
+    <item
+        android:id="@+id/item_teacher_logout"
+        app:showAsAction="never"
+        android:orderInCategory="100"
+        android:title="Logout" />
 </menu>

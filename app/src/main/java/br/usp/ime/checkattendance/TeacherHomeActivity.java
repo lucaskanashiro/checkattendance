@@ -70,6 +70,8 @@ public class TeacherHomeActivity extends AppCompatActivity {
             Intent intent = new Intent(TeacherHomeActivity.this, RegisterActivity.class);
             intent.putExtra("type", "teacher");
             startActivity(intent);
+        } else if (id == R.id.item_teacher_logout) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
