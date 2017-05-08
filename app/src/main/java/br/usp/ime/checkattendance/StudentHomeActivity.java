@@ -153,11 +153,12 @@ public class StudentHomeActivity extends AppCompatActivity {
                     attendedSeminarFragment.setArguments(args);
                     return attendedSeminarFragment;
                 case 1:
-                    Fragment seminarFragment2 = new SeminarsFragment();
+                    Fragment seminarFragment = new SeminarsFragment();
                     Bundle args2 = new Bundle();
                     args2.putString("response", seminars);
-                    seminarFragment2.setArguments(args2);
-                    return seminarFragment2;
+                    args2.putString("type", "student");
+                    seminarFragment.setArguments(args2);
+                    return seminarFragment;
             }
 
             return null;

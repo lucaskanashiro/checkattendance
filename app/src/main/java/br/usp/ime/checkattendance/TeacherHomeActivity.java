@@ -130,12 +130,14 @@ public class TeacherHomeActivity extends AppCompatActivity {
                     Fragment seminarFragment = new SeminarsFragment();
                     Bundle args = new Bundle();
                     args.putString("response", seminars);
+                    args.putString("type", "teacher");
                     seminarFragment.setArguments(args);
                     return seminarFragment;
                 case 1:
                     Fragment seminarFragment2 = new SeminarsFragment();
                     Bundle args2 = new Bundle();
                     args2.putString("response", seminars);
+                    args2.putString("type", "teacher");
                     seminarFragment2.setArguments(args2);
                     return seminarFragment2;
             }

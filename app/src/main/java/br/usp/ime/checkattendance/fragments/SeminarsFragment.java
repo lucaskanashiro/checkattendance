@@ -37,6 +37,7 @@ public class SeminarsFragment extends Fragment {
 
     private ArrayList<Seminar> seminars;
     private String allSeminars;
+    private String type;
 
     public SeminarsFragment() {
         this.seminars = new ArrayList<Seminar>();
@@ -48,13 +49,20 @@ public class SeminarsFragment extends Fragment {
 
         Bundle args = getArguments();
         this.allSeminars = args.getString("response");
+        this.type = args.getString("type");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_seminars, container, false);
+        View rootView;
+
+        if (this.type.equals("student")) {
+            rootView = inflater.inflate(R.layout.fragment_seminars, container, false);
+        } else {
+            rootView = inflater.inflate(R.layout.fragment_seminars_teacher, container, false);
+        }
 
         RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
         rv.setHasFixedSize(true);
