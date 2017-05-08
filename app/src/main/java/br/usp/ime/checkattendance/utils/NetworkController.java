@@ -50,10 +50,24 @@ public class NetworkController {
         this.get(url, context, callback);
     }
 
+    public void getTeacherData(String nusp, Context context, ServerCallback callback){
+
+        String url = "http://207.38.82.139:8001/teacher/get/" + nusp;
+        this.get(url, context, callback);
+    }
+
     public void updateStudentData(String nusp, String name, String passwd, Context context,
                                   ServerCallback callback) {
 
         String url = "http://207.38.82.139:8001/student/edit";
+        String params = "nusp=" + nusp + "&name=" + name + "&pass=" + passwd;
+        this.post(url, params, context, callback);
+    }
+
+    public void updateTeacherData(String nusp, String name, String passwd, Context context,
+                                  ServerCallback callback) {
+
+        String url = "http://207.38.82.139:8001/teacher/edit";
         String params = "nusp=" + nusp + "&name=" + name + "&pass=" + passwd;
         this.post(url, params, context, callback);
     }

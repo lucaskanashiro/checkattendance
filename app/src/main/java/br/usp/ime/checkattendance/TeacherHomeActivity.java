@@ -34,11 +34,18 @@ public class TeacherHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_home);
 
-        Intent intent = getIntent();
-        this.nusp = intent.getStringExtra("nusp");
+        this.getSentData();
 
         this.networkController = new NetworkController();
+        this.setupSeminars();
+    }
 
+    private void getSentData() {
+        Intent intent = getIntent();
+        this.nusp = intent.getStringExtra("nusp");
+    }
+
+    private void setupSeminars() {
         this.networkController.getAllSeminars(this, new ServerCallback() {
                     @Override
                     public void onSuccess(String response) {
@@ -72,6 +79,11 @@ public class TeacherHomeActivity extends AppCompatActivity {
             startActivity(intent);
         } else if (id == R.id.item_teacher_logout) {
             finish();
+        } else if (id == R.id.item_edit_teacher) {
+            Intent intent = new Intent(TeacherHomeActivity.this, UpdateProfileActivity.class);
+            intent.putExtra("type", "teacher");
+            intent.putExtra("nusp", this.nusp);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

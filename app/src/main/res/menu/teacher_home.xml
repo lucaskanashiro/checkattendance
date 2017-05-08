@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/item_edit_teacher"
+        app:showAsAction="never"
+        android:orderInCategory="100"
+        android:title="Edit Profile" />
+
+    <item
         android:id="@+id/item_register_teacher"
         app:showAsAction="never"
         android:orderInCategory="100"

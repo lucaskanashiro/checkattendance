@@ -27,6 +27,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private String nusp_sent;
     private NetworkController networkController;
     private String current_name;
+    private ServerCallback serverCallbackGetData;
+    private ServerCallback serverCallbackUpdateData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         initializeUIComponents();
 
         this.networkController = new NetworkController();
-
+        setupCallbacks();
         getCurrentData();
     }
 
@@ -70,21 +72,48 @@ public class UpdateProfileActivity extends AppCompatActivity {
         this.mPasswdEditText = (EditText) findViewById(R.id.et_passwd_edit);
     }
 
+    private void setupCallbacks() {
+        this.serverCallbackGetData = new ServerCallback() {
+            @Override
+            public void onSuccess(String response) {
+                Log.d("VAMO QUE VAMO", response);
+                if (response.contains("\"success\":true")) {
+                    setCurrentDataInForm(response);
+                }
+            }
+
+            @Override
+            public void onError() {}
+        };
+
+        this.serverCallbackUpdateData = new ServerCallback() {
+            @Override
+            public void onSuccess(String response) {
+                if (response.contains("\"success\":true")) {
+                    String message = "Profile updated!";
+                    Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                    UpdateProfileActivity.this.finish();
+                } else {
+                    String message = "Your profile was not updated. Try again later";
+                    Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                    UpdateProfileActivity.this.finish();
+                }
+            }
+
+            @Override
+            public void onError() {
+                String message = "Your profile was not updated. Try again later";
+                Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                UpdateProfileActivity.this.finish();
+            }
+        };
+    }
+
     private void getCurrentData() {
         if (this.type.equals("student")) {
-            this.networkController.getStudentData(this.nusp_sent, this, new ServerCallback() {
-                @Override
-                public void onSuccess(String response) {
-                    if (response.contains("\"success\":true")) {
-                        setCurrentDataInForm(response);
-                    }
-                }
-
-                @Override
-                public void onError() {}
-            });
+            this.networkController.getStudentData(this.nusp_sent, this, this.serverCallbackGetData);
         } else {
-            // Teacher
+            this.networkController.getTeacherData(this.nusp_sent, this, this.serverCallbackGetData);
         }
     }
 
@@ -112,32 +141,13 @@ public class UpdateProfileActivity extends AppCompatActivity {
             String message = "You must provide a password to update your profile";
             Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
         } else {
-
-            this.networkController.updateStudentData(nusp, name, passwd, this, new ServerCallback() {
-
-                        @Override
-                        public void onSuccess(String response) {
-                            if (response.contains("\"success\":true")) {
-                                String message = "Profile updated!";
-                                Toast.makeText(UpdateProfileActivity.this, message,
-                                        Toast.LENGTH_LONG).show();
-                                UpdateProfileActivity.this.finish();
-                            } else {
-                                String message = "Your profile was not updated. Try again later";
-                                Toast.makeText(UpdateProfileActivity.this, message,
-                                        Toast.LENGTH_LONG).show();
-                                UpdateProfileActivity.this.finish();
-                            }
-                        }
-
-                        @Override
-                        public void onError() {
-                            String message = "Your profile was not updated. Try again later";
-                            Toast.makeText(UpdateProfileActivity.this, message,
-                                    Toast.LENGTH_LONG).show();
-                            UpdateProfileActivity.this.finish();
-                        }
-                    });
+            if (this.type.equals("student")) {
+                this.networkController.updateStudentData(nusp, name, passwd, this,
+                        this.serverCallbackUpdateData);
+            } else {
+                this.networkController.updateTeacherData(nusp, name, passwd, this,
+                        this.serverCallbackUpdateData);
+            }
         }
     }
 }
