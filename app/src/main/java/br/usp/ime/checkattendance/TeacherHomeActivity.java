@@ -106,6 +106,11 @@ public class TeacherHomeActivity extends AppCompatActivity {
         }
     }
 
+    public void createSeminar(View v) {
+        Intent intent = new Intent(TeacherHomeActivity.this, RegisterSeminarActivity.class);
+        startActivity(intent);
+    }
+
     class PagerAdapter extends FragmentPagerAdapter {
         String tabTitles[] = new String[] { "Sponsored Seminars", "All Seminars"};
         Context context;
