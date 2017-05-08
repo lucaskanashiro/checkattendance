@@ -41,19 +41,26 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        setupActionBar();
+        getSentData();
+
+        this.networkController = new NetworkController();
+        initializeUIComponents();
+        initializeCallback();
+    }
+
+    private void setupActionBar() {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
             actionBar.setTitle("Register");
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
 
+    private void getSentData() {
         Intent intent = getIntent();
         this.type = intent.getStringExtra("type");
-
-        this.networkController = new NetworkController();
-        initializeUIComponents();
-        initializeCallback();
     }
 
     private void initializeUIComponents() {
