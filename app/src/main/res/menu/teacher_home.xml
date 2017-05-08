@@ -6,7 +6,7 @@
         android:id="@+id/item_edit_teacher"
         app:showAsAction="never"
         android:orderInCategory="100"
-        android:title="Edit Profile" />
+        android:title="Update Profile" />
 
     <item
         android:id="@+id/item_register_teacher"
