@@ -1,12 +1,14 @@
 package br.usp.ime.checkattendance;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -129,6 +132,37 @@ public class TeacherHomeActivity extends AppCompatActivity {
                 public void onError() {}
             });
         }
+    }
+
+    public void cardDetails(View v) {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View promptView = layoutInflater.inflate(R.layout.card_detail_teacher, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog alert = builder.create();
+
+        TextView seminarName = (TextView) promptView.findViewById(R.id.tv_seminar_name_details);
+        ImageButton closeButton = (ImageButton) promptView.findViewById(R.id.btn_close);
+        ImageButton editSeminar = (ImageButton) promptView.findViewById(R.id.btn_edit_seminar);
+
+        seminarName.setText("blablablablablablabla");
+        editSeminar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TeacherHomeActivity.this, UpdateSeminarActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alert.dismiss();
+            }
+        });
+
+        alert.setView(promptView);
+        alert.show();
     }
 
     class PagerAdapter extends FragmentPagerAdapter {

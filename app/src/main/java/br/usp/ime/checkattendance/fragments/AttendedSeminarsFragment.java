@@ -62,7 +62,7 @@ public class AttendedSeminarsFragment extends Fragment {
             Toast.makeText(getContext(), "You did not attended any seminar", Toast.LENGTH_LONG).show();
         }
 
-        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars);
+        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars, "student");
         rv.setAdapter(adapter);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());

@@ -71,7 +71,7 @@ public class SeminarsFragment extends Fragment {
 
         this.seminars = this.parseStringResponse(this.allSeminars);
 
-        this.adapter = new SeminarAdapter(this.seminars);
+        this.adapter = new SeminarAdapter(this.seminars, this.type);
         this.linearLayoutManager = new LinearLayoutManager(getActivity());
         this.setupRecyclerView();
 
@@ -108,7 +108,7 @@ public class SeminarsFragment extends Fragment {
     public void setData(String seminars) {
         ArrayList<Seminar> allSeminars= this.parseStringResponse(seminars);
 
-        SeminarAdapter adapter = new SeminarAdapter(allSeminars);
+        SeminarAdapter adapter = new SeminarAdapter(allSeminars, this.type);
         this.recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

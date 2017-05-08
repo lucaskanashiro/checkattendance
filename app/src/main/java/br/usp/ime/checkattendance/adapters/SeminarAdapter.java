@@ -19,20 +19,24 @@ import br.usp.ime.checkattendance.models.Seminar;
 public class SeminarAdapter extends RecyclerView.Adapter<SeminarAdapter.SeminarViewHolder> {
 
     private ArrayList<Seminar> seminars;
+    private String type;
 
     public static class SeminarViewHolder extends RecyclerView.ViewHolder {
-        public CardView mCardView;
-        public TextView mTextView;
+        private CardView mCardView;
+        private TextView mTextView;
+
         public SeminarViewHolder(View v) {
             super(v);
 
-            mCardView = (CardView) v.findViewById(R.id.card_view);
-            mTextView = (TextView) v.findViewById(R.id.tv_text);
+            this.mCardView = (CardView) v.findViewById(R.id.card_view);
+            this.mTextView = (TextView) v.findViewById(R.id.tv_text);
         }
+
     }
 
-    public SeminarAdapter(ArrayList<Seminar> myDataset) {
+    public SeminarAdapter(ArrayList<Seminar> myDataset, String type) {
         this.seminars = myDataset;
+        this.type = type;
     }
 
     @Override
@@ -40,8 +44,7 @@ public class SeminarAdapter extends RecyclerView.Adapter<SeminarAdapter.SeminarV
                                                      int viewType) {
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_item, parent, false);
-        SeminarViewHolder vh = new SeminarViewHolder(v);
-        return vh;
+        return new SeminarViewHolder(v);
     }
 
     @Override
