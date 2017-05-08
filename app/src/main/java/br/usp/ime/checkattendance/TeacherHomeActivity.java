@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,8 @@ public class TeacherHomeActivity extends AppCompatActivity {
     private TeacherHomeActivity.PagerAdapter pagerAdapter;
     private TabLayout tabLayout;
     private NetworkController networkController;
+
+    private final static int REFRESH_PAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,18 +111,62 @@ public class TeacherHomeActivity extends AppCompatActivity {
 
     public void createSeminar(View v) {
         Intent intent = new Intent(TeacherHomeActivity.this, RegisterSeminarActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == REFRESH_PAGE) {
+            this.networkController.getAllSeminars(this, new ServerCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    allSeminars = response;
+                    pagerAdapter.getFragment1().setData(response);
+                    pagerAdapter.getFragment2().setData(response);
+                }
+
+                @Override
+                public void onError() {}
+            });
+        }
     }
 
     class PagerAdapter extends FragmentPagerAdapter {
-        String tabTitles[] = new String[] { "Sponsored Seminars", "All Seminars"};
-        Context context;
-        String seminars;
+        private String tabTitles[] = new String[] { "Sponsored Seminars", "All Seminars"};
+        private Context context;
+        private String seminars;
+        private Bundle args;
+        private SeminarsFragment fragment1, fragment2;
 
         public PagerAdapter(FragmentManager fm, Context context, String seminars) {
             super(fm);
             this.context = context;
             this.seminars = seminars;
+
+            this.setupFragmentArgs();
+            this.setupFragments();
+        }
+
+        public SeminarsFragment getFragment1() {
+            return this.fragment1;
+        }
+
+        public SeminarsFragment getFragment2() {
+            return this.fragment2;
+        }
+
+        private void setupFragmentArgs() {
+            this.args = new Bundle();
+            args.putString("response", seminars);
+            args.putString("type", "teacher");
+        }
+
+        private void setupFragments() {
+            this.fragment1 = new SeminarsFragment();
+            this.fragment1.setArguments(this.args);
+
+            this.fragment2 = new SeminarsFragment();
+            this.fragment2.setArguments(this.args);
         }
 
         @Override
@@ -132,19 +179,9 @@ public class TeacherHomeActivity extends AppCompatActivity {
 
             switch (position) {
                 case 0:
-                    Fragment seminarFragment = new SeminarsFragment();
-                    Bundle args = new Bundle();
-                    args.putString("response", seminars);
-                    args.putString("type", "teacher");
-                    seminarFragment.setArguments(args);
-                    return seminarFragment;
+                    return this.fragment1;
                 case 1:
-                    Fragment seminarFragment2 = new SeminarsFragment();
-                    Bundle args2 = new Bundle();
-                    args2.putString("response", seminars);
-                    args2.putString("type", "teacher");
-                    seminarFragment2.setArguments(args2);
-                    return seminarFragment2;
+                    return this.fragment2;
             }
 
             return null;

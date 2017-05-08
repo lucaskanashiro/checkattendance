@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -26,8 +27,10 @@ import br.usp.ime.checkattendance.R;
 import br.usp.ime.checkattendance.StudentHomeActivity;
 import br.usp.ime.checkattendance.adapters.SeminarAdapter;
 import br.usp.ime.checkattendance.models.Seminar;
+import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.Parser;
 import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
+import br.usp.ime.checkattendance.utils.ServerCallback;
 
 /**
  * Created by kanashiro on 5/6/17.
@@ -38,6 +41,11 @@ public class SeminarsFragment extends Fragment {
     private ArrayList<Seminar> seminars;
     private String allSeminars;
     private String type;
+    private Bundle args;
+    private View rootView;
+    private RecyclerView recyclerView;
+    private SeminarAdapter adapter;
+    private LinearLayoutManager linearLayoutManager;
 
     public SeminarsFragment() {
         this.seminars = new ArrayList<Seminar>();
@@ -46,8 +54,11 @@ public class SeminarsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getBundleArgs();
+    }
 
-        Bundle args = getArguments();
+    private void getBundleArgs() {
+        this.args = getArguments();
         this.allSeminars = args.getString("response");
         this.type = args.getString("type");
     }
@@ -56,31 +67,50 @@ public class SeminarsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView;
+        this.inflateLayout(inflater, container);
 
+        this.seminars = this.parseStringResponse(this.allSeminars);
+
+        this.adapter = new SeminarAdapter(this.seminars);
+        this.linearLayoutManager = new LinearLayoutManager(getActivity());
+        this.setupRecyclerView();
+
+        return this.rootView;
+    }
+
+    private void inflateLayout(LayoutInflater inflater, ViewGroup container) {
         if (this.type.equals("student")) {
-            rootView = inflater.inflate(R.layout.fragment_seminars, container, false);
+            this.rootView = inflater.inflate(R.layout.fragment_seminars, container, false);
         } else {
-            rootView = inflater.inflate(R.layout.fragment_seminars_teacher, container, false);
+            this.rootView = inflater.inflate(R.layout.fragment_seminars_teacher, container, false);
         }
+    }
 
-        RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
-        rv.setHasFixedSize(true);
+    private void setupRecyclerView() {
+        this.recyclerView = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
+        this.recyclerView.setHasFixedSize(true);
+        this.recyclerView.setAdapter(adapter);
+        this.recyclerView.setLayoutManager(this.linearLayoutManager);
+    }
+
+    private ArrayList<Seminar> parseStringResponse(String seminarsString) {
+        ArrayList<Seminar> seminarArrayList = new ArrayList<Seminar>();
 
         try {
-            this.seminars = Parser.parseSeminars(this.allSeminars);
+            seminarArrayList = Parser.parseSeminars(seminarsString);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        Log.d("SEMINARS FRAGMENT", this.seminars.toString() + "\n");
-        SeminarAdapter adapter = new SeminarAdapter(this.seminars);
-        rv.setAdapter(adapter);
+        return seminarArrayList;
+    }
 
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        rv.setLayoutManager(llm);
+    public void setData(String seminars) {
+        ArrayList<Seminar> allSeminars= this.parseStringResponse(seminars);
 
-        return rootView;
+        SeminarAdapter adapter = new SeminarAdapter(allSeminars);
+        this.recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
 }

@@ -20,6 +20,9 @@ public class RegisterSeminarActivity extends AppCompatActivity {
     private NetworkController networkController;
     private ServerCallback serverCallback;
 
+    private final static int REFRESH_PAGE = 1;
+    private final static int NOT_REFRESH_PAGE = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,7 @@ public class RegisterSeminarActivity extends AppCompatActivity {
             public void onSuccess(String response) {
                 String message = "The seminar was registered successfully";
                 Toast.makeText(RegisterSeminarActivity.this, message, Toast.LENGTH_LONG).show();
+                setResult(REFRESH_PAGE);
                 finish();
             }
 
@@ -52,6 +56,7 @@ public class RegisterSeminarActivity extends AppCompatActivity {
             public void onError() {
                 String message = "We had some problem. Please, try again later";
                 Toast.makeText(RegisterSeminarActivity.this, message, Toast.LENGTH_LONG).show();
+                setResult(NOT_REFRESH_PAGE);
                 finish();
             }
         };
@@ -68,8 +73,10 @@ public class RegisterSeminarActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home)
+        if (item.getItemId() == android.R.id.home) {
+            setResult(NOT_REFRESH_PAGE);
             finish();
+        }
 
         return super.onOptionsItemSelected(item);
     }
