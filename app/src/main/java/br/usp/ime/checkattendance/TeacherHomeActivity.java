@@ -1,7 +1,6 @@
 package br.usp.ime.checkattendance;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -11,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,15 +18,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
-
-import java.util.ArrayList;
-
 import br.usp.ime.checkattendance.fragments.SeminarsFragment;
 import br.usp.ime.checkattendance.models.Seminar;
 import br.usp.ime.checkattendance.utils.ClickListener;
 import br.usp.ime.checkattendance.utils.NetworkController;
-import br.usp.ime.checkattendance.utils.Parser;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class TeacherHomeActivity extends AppCompatActivity implements ClickListener {
@@ -41,6 +34,14 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     private TabLayout tabLayout;
     private NetworkController networkController;
 
+    private LayoutInflater layoutInflater;
+    private View dialogView;
+    private AlertDialog alertDialog;
+    private TextView seminarNameTextView;
+    private ImageButton closeDialogButton;
+    private ImageButton editSeminarButton;
+
+
     private final static int REFRESH_PAGE = 1;
 
     @Override
@@ -52,6 +53,8 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
         this.networkController = new NetworkController();
         this.setupSeminars();
+        this.setupDialogView();
+        this.createDialog();
     }
 
     private void getSentData() {
@@ -75,6 +78,23 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
                     }
                 }
         );
+    }
+
+    private void setupDialogView() {
+        this.layoutInflater = LayoutInflater.from(this);
+        this.dialogView = layoutInflater.inflate(R.layout.seminar_detail_teacher, null);
+        this.initializeDialogComponents();
+    }
+
+    private void initializeDialogComponents() {
+        this.seminarNameTextView = (TextView) this.dialogView.findViewById(R.id.tv_seminar_name_details);
+        this.closeDialogButton = (ImageButton) this.dialogView.findViewById(R.id.btn_close);
+        this.editSeminarButton = (ImageButton) this.dialogView.findViewById(R.id.btn_edit_seminar);
+    }
+
+    private void createDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        this.alertDialog = builder.create();
     }
 
     @Override
@@ -128,53 +148,49 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == REFRESH_PAGE) {
-            this.networkController.getAllSeminars(this, new ServerCallback() {
-                @Override
-                public void onSuccess(String response) {
-                    allSeminars = response;
-                    pagerAdapter.getFragment1().setData(response);
-                    pagerAdapter.getFragment2().setData(response);
-                }
-
-                @Override
-                public void onError() {}
-            });
+            this.updateFragmentsData();
+            this.alertDialog.dismiss();
         }
     }
 
+    private void updateFragmentsData() {
+        this.networkController.getAllSeminars(this, new ServerCallback() {
+            @Override
+            public void onSuccess(String response) {
+                allSeminars = response;
+                pagerAdapter.getFragment1().setData(response);
+                pagerAdapter.getFragment2().setData(response);
+            }
+
+            @Override
+            public void onError() {}
+        });
+    }
+
     @Override
-    public void onSeminarClick(Seminar seminar) {
+    public void onSeminarClick(final Seminar seminar) {
         this.seminarInstance = seminar;
 
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        View promptView = layoutInflater.inflate(R.layout.card_detail_teacher, null);
+        this.seminarNameTextView.setText(seminar.getName());
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final AlertDialog alert = builder.create();
-
-        TextView seminarName = (TextView) promptView.findViewById(R.id.tv_seminar_name_details);
-        ImageButton closeButton = (ImageButton) promptView.findViewById(R.id.btn_close);
-        ImageButton editSeminar = (ImageButton) promptView.findViewById(R.id.btn_edit_seminar);
-
-        seminarName.setText(seminar.getName());
-
-        editSeminar.setOnClickListener(new View.OnClickListener() {
+        this.editSeminarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TeacherHomeActivity.this, UpdateSeminarActivity.class);
-                startActivity(intent);
+                intent.putExtra("id", seminar.getId());
+                startActivityForResult(intent, 0);
             }
         });
 
-        closeButton.setOnClickListener(new View.OnClickListener() {
+        this.closeDialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alert.dismiss();
+                alertDialog.dismiss();
             }
         });
 
-        alert.setView(promptView);
-        alert.show();
+        this.alertDialog.setView(this.dialogView);
+        this.alertDialog.show();
     }
 
     public class PagerAdapter extends FragmentPagerAdapter {

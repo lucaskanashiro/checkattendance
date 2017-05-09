@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
+        android:textStyle="bold"
         android:text="Name"/>
 
     <EditText
@@ -27,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
+        android:textStyle="bold"
         android:text="NUSP"/>
 
     <EditText
@@ -44,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
+        android:textStyle="bold"
         android:text="Password"/>
 
     <EditText

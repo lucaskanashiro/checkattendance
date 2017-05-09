@@ -76,7 +76,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
         this.serverCallbackGetData = new ServerCallback() {
             @Override
             public void onSuccess(String response) {
-                Log.d("VAMO QUE VAMO", response);
                 if (response.contains("\"success\":true")) {
                     setCurrentDataInForm(response);
                 }
