@@ -1,6 +1,7 @@
 package br.usp.ime.checkattendance;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,8 +41,8 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     private AlertDialog alertDialog;
     private TextView seminarNameTextView;
     private ImageButton closeDialogButton;
-    private ImageButton editSeminarButton;
-
+    private Button editSeminarButton;
+    private Button qrCodeButton;
 
     private final static int REFRESH_PAGE = 1;
 
@@ -89,7 +91,8 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     private void initializeDialogComponents() {
         this.seminarNameTextView = (TextView) this.dialogView.findViewById(R.id.tv_seminar_name_details);
         this.closeDialogButton = (ImageButton) this.dialogView.findViewById(R.id.btn_close);
-        this.editSeminarButton = (ImageButton) this.dialogView.findViewById(R.id.btn_edit_seminar);
+        this.editSeminarButton = (Button) this.dialogView.findViewById(R.id.btn_edit_seminar);
+        this.qrCodeButton = (Button) this.dialogView.findViewById(R.id.btn_qr_code);
     }
 
     private void createDialog() {
