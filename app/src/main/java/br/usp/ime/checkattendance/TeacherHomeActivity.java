@@ -158,8 +158,7 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
             @Override
             public void onSuccess(String response) {
                 allSeminars = response;
-                pagerAdapter.getFragment1().setData(response);
-                pagerAdapter.getFragment2().setData(response);
+                pagerAdapter.getFragment().setData(response);
             }
 
             @Override
@@ -194,11 +193,11 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     }
 
     public class PagerAdapter extends FragmentPagerAdapter {
-        private String tabTitles[] = new String[] { "Sponsored Seminars", "All Seminars"};
+        private String tabTitles[] = new String[] {"Seminars"};
         private Context context;
         private String seminars;
         private Bundle args;
-        private SeminarsFragment fragment1, fragment2;
+        private SeminarsFragment fragment;
 
         public PagerAdapter(FragmentManager fm, Context context, String seminars) {
             super(fm);
@@ -209,12 +208,8 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
             this.setupFragments();
         }
 
-        public SeminarsFragment getFragment1() {
-            return this.fragment1;
-        }
-
-        public SeminarsFragment getFragment2() {
-            return this.fragment2;
+        public SeminarsFragment getFragment() {
+            return this.fragment;
         }
 
         private void setupFragmentArgs() {
@@ -224,13 +219,9 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
         }
 
         private void setupFragments() {
-            this.fragment1 = new SeminarsFragment();
-            this.fragment1.setArguments(this.args);
-            this.fragment1.setListener(TeacherHomeActivity.this);
-
-            this.fragment2 = new SeminarsFragment();
-            this.fragment2.setArguments(this.args);
-            this.fragment2.setListener(TeacherHomeActivity.this);
+            this.fragment = new SeminarsFragment();
+            this.fragment.setArguments(this.args);
+            this.fragment.setListener(TeacherHomeActivity.this);
         }
 
         @Override
@@ -243,9 +234,7 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
             switch (position) {
                 case 0:
-                    return this.fragment1;
-                case 1:
-                    return this.fragment2;
+                    return this.fragment;
             }
 
             return null;
