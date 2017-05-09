@@ -184,6 +184,16 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
             }
         });
 
+        this.qrCodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TeacherHomeActivity.this, TeacherQRCodeActivity.class);
+                intent.putExtra("id", seminar.getId());
+                intent.putExtra("name", seminar.getName());
+                startActivity(intent);
+            }
+        });
+
         this.closeDialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
