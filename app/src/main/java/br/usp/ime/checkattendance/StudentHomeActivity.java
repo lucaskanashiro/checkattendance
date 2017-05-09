@@ -30,11 +30,12 @@ import java.util.ArrayList;
 import br.usp.ime.checkattendance.fragments.AttendedSeminarsFragment;
 import br.usp.ime.checkattendance.fragments.SeminarsFragment;
 import br.usp.ime.checkattendance.models.Seminar;
+import br.usp.ime.checkattendance.utils.ClickListener;
 import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
-public class StudentHomeActivity extends AppCompatActivity {
+public class StudentHomeActivity extends AppCompatActivity implements ClickListener {
 
     private String nusp;
     private String allSeminars;
@@ -123,6 +124,11 @@ public class StudentHomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSeminarClick(Seminar seminar) {
+        // TODO
+    }
+
     class PagerAdapter extends FragmentPagerAdapter {
         String tabTitles[] = new String[] { "Attended Seminars", "All Seminars"};
         Context context;
@@ -153,11 +159,12 @@ public class StudentHomeActivity extends AppCompatActivity {
                     attendedSeminarFragment.setArguments(args);
                     return attendedSeminarFragment;
                 case 1:
-                    Fragment seminarFragment = new SeminarsFragment();
+                    SeminarsFragment seminarFragment = new SeminarsFragment();
                     Bundle args2 = new Bundle();
                     args2.putString("response", seminars);
                     args2.putString("type", "student");
                     seminarFragment.setArguments(args2);
+                    seminarFragment.setListener(StudentHomeActivity.this);
                     return seminarFragment;
             }
 

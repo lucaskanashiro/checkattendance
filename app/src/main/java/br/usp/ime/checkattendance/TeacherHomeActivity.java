@@ -20,12 +20,20 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
+import java.util.ArrayList;
+
 import br.usp.ime.checkattendance.fragments.SeminarsFragment;
+import br.usp.ime.checkattendance.models.Seminar;
+import br.usp.ime.checkattendance.utils.ClickListener;
 import br.usp.ime.checkattendance.utils.NetworkController;
+import br.usp.ime.checkattendance.utils.Parser;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
-public class TeacherHomeActivity extends AppCompatActivity {
+public class TeacherHomeActivity extends AppCompatActivity implements ClickListener {
 
+    private Seminar seminarInstance;
     private String nusp;
     private String allSeminars;
     private ViewPager viewPager;
@@ -134,7 +142,10 @@ public class TeacherHomeActivity extends AppCompatActivity {
         }
     }
 
-    public void cardDetails(View v) {
+    @Override
+    public void onSeminarClick(Seminar seminar) {
+        this.seminarInstance = seminar;
+
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         View promptView = layoutInflater.inflate(R.layout.card_detail_teacher, null);
 
@@ -145,7 +156,8 @@ public class TeacherHomeActivity extends AppCompatActivity {
         ImageButton closeButton = (ImageButton) promptView.findViewById(R.id.btn_close);
         ImageButton editSeminar = (ImageButton) promptView.findViewById(R.id.btn_edit_seminar);
 
-        seminarName.setText("blablablablablablabla");
+        seminarName.setText(seminar.getName());
+
         editSeminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,7 +177,7 @@ public class TeacherHomeActivity extends AppCompatActivity {
         alert.show();
     }
 
-    class PagerAdapter extends FragmentPagerAdapter {
+    public class PagerAdapter extends FragmentPagerAdapter {
         private String tabTitles[] = new String[] { "Sponsored Seminars", "All Seminars"};
         private Context context;
         private String seminars;
@@ -198,9 +210,11 @@ public class TeacherHomeActivity extends AppCompatActivity {
         private void setupFragments() {
             this.fragment1 = new SeminarsFragment();
             this.fragment1.setArguments(this.args);
+            this.fragment1.setListener(TeacherHomeActivity.this);
 
             this.fragment2 = new SeminarsFragment();
             this.fragment2.setArguments(this.args);
+            this.fragment2.setListener(TeacherHomeActivity.this);
         }
 
         @Override

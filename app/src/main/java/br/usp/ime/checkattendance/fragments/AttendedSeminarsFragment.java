@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import br.usp.ime.checkattendance.R;
 import br.usp.ime.checkattendance.adapters.SeminarAdapter;
 import br.usp.ime.checkattendance.models.Seminar;
+import br.usp.ime.checkattendance.utils.ClickListener;
 import br.usp.ime.checkattendance.utils.Parser;
 
 /**
@@ -29,6 +30,7 @@ public class AttendedSeminarsFragment extends Fragment {
 
     private ArrayList<Seminar> attendedSeminars;
     private String seminars;
+    private ClickListener listener;
 
     public AttendedSeminarsFragment() {
         this.attendedSeminars = new ArrayList<Seminar>();
@@ -41,6 +43,10 @@ public class AttendedSeminarsFragment extends Fragment {
         Bundle args = getArguments();
         this.seminars = args.getString("response");
         this.attendedSeminars = new ArrayList<Seminar>();
+    }
+
+    public void setListener(ClickListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -62,7 +68,7 @@ public class AttendedSeminarsFragment extends Fragment {
             Toast.makeText(getContext(), "You did not attended any seminar", Toast.LENGTH_LONG).show();
         }
 
-        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars, "student");
+        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars, "student", this.listener);
         rv.setAdapter(adapter);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());

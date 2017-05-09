@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
+        android:layout_margin="10dp"
         android:src="@drawable/ic_close_black_24dp"
         android:background="#ffffff"/>
 
@@ -16,6 +17,7 @@
         android:id="@+id/tv_seminar_name_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:layout_margin="20dp" />
 
     <ImageButton

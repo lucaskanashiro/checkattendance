@@ -27,6 +27,7 @@ import br.usp.ime.checkattendance.R;
 import br.usp.ime.checkattendance.StudentHomeActivity;
 import br.usp.ime.checkattendance.adapters.SeminarAdapter;
 import br.usp.ime.checkattendance.models.Seminar;
+import br.usp.ime.checkattendance.utils.ClickListener;
 import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.Parser;
 import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
@@ -46,9 +47,14 @@ public class SeminarsFragment extends Fragment {
     private RecyclerView recyclerView;
     private SeminarAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
+    private ClickListener listener;
 
     public SeminarsFragment() {
         this.seminars = new ArrayList<Seminar>();
+    }
+
+    public void setListener(ClickListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -71,7 +77,7 @@ public class SeminarsFragment extends Fragment {
 
         this.seminars = this.parseStringResponse(this.allSeminars);
 
-        this.adapter = new SeminarAdapter(this.seminars, this.type);
+        this.adapter = new SeminarAdapter(this.seminars, this.type, this.listener);
         this.linearLayoutManager = new LinearLayoutManager(getActivity());
         this.setupRecyclerView();
 
@@ -108,7 +114,7 @@ public class SeminarsFragment extends Fragment {
     public void setData(String seminars) {
         ArrayList<Seminar> allSeminars= this.parseStringResponse(seminars);
 
-        SeminarAdapter adapter = new SeminarAdapter(allSeminars, this.type);
+        SeminarAdapter adapter = new SeminarAdapter(allSeminars, this.type, this.listener);
         this.recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
