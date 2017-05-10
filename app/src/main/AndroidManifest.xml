@@ -30,7 +30,8 @@
         <activity android:name=".UpdateProfileActivity" />
         <activity android:name=".RegisterSeminarActivity" />
         <activity android:name=".UpdateSeminarActivity" />
-        <activity android:name=".TeacherQRCodeActivity"></activity>
+        <activity android:name=".TeacherQRCodeActivity" />
+        <activity android:name=".StudentQRCodeActivity"></activity>
     </application>
 
 </manifest>

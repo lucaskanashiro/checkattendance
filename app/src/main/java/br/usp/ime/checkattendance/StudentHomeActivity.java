@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +47,13 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
     private PagerAdapter pagerAdapter;
     private TabLayout tabLayout;
     private NetworkController networkController;
+
+    private LayoutInflater layoutInflater;
+    private View dialogView;
+    private AlertDialog alertDialog;
+    private TextView seminarNameTextView;
+    private ImageButton closeDialogButton;
+    private Button qrCodeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +93,9 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                 Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
+
+        this.setupDialogView();
+        this.createDialog();
     }
 
     private void setupViewPager() {
@@ -100,6 +113,23 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
             TabLayout.Tab tab = this.tabLayout.getTabAt(i);
             tab.setCustomView(this.pagerAdapter.getTabView(i));
         }
+    }
+
+    private void setupDialogView() {
+        this.layoutInflater = LayoutInflater.from(this);
+        this.dialogView = layoutInflater.inflate(R.layout.seminar_detail_student, null);
+        this.initializeDialogComponents();
+    }
+
+    private void initializeDialogComponents() {
+        this.seminarNameTextView = (TextView) this.dialogView.findViewById(R.id.tv_seminar_name_details_student);
+        this.closeDialogButton = (ImageButton) this.dialogView.findViewById(R.id.btn_close_student);
+        this.qrCodeButton = (Button) this.dialogView.findViewById(R.id.btn_qr_code_student);
+    }
+
+    private void createDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        this.alertDialog = builder.create();
     }
 
     @Override
@@ -125,8 +155,29 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
     }
 
     @Override
-    public void onSeminarClick(Seminar seminar) {
-        // TODO
+    public void onSeminarClick(final Seminar seminar) {
+        this.seminarNameTextView.setText(seminar.getName());
+
+        this.qrCodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StudentHomeActivity.this, StudentQRCodeActivity.class);
+                intent.putExtra("id", seminar.getId());
+                intent.putExtra("name", seminar.getName());
+                intent.putExtra("nusp", nusp);
+                startActivity(intent);
+            }
+        });
+
+        this.closeDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        this.alertDialog.setView(this.dialogView);
+        this.alertDialog.show();
     }
 
     class PagerAdapter extends FragmentPagerAdapter {
