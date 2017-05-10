@@ -39,8 +39,6 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     private LayoutInflater layoutInflater;
     private View dialogView;
     private AlertDialog alertDialog;
-    private TextView seminarNameTextView;
-    private ImageButton closeDialogButton;
     private Button editSeminarButton;
     private Button qrCodeButton;
 
@@ -89,10 +87,8 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     }
 
     private void initializeDialogComponents() {
-        this.seminarNameTextView = (TextView) this.dialogView.findViewById(R.id.tv_seminar_name_details);
-        this.closeDialogButton = (ImageButton) this.dialogView.findViewById(R.id.btn_close);
         this.editSeminarButton = (Button) this.dialogView.findViewById(R.id.btn_edit_seminar);
-        this.qrCodeButton = (Button) this.dialogView.findViewById(R.id.btn_qr_code);
+        this.qrCodeButton = (Button) this.dialogView.findViewById(R.id.btn_qr_code_teacher);
     }
 
     private void createDialog() {
@@ -171,9 +167,7 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
     @Override
     public void onSeminarClick(final Seminar seminar) {
-        this.seminarInstance = seminar;
-
-        this.seminarNameTextView.setText(seminar.getName());
+        this.alertDialog.setTitle(seminar.getName());
 
         this.editSeminarButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,13 +185,6 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
                 intent.putExtra("id", seminar.getId());
                 intent.putExtra("name", seminar.getName());
                 startActivity(intent);
-            }
-        });
-
-        this.closeDialogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
             }
         });
 

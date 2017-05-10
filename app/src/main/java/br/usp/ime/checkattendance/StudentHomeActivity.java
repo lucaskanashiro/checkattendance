@@ -51,8 +51,6 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
     private LayoutInflater layoutInflater;
     private View dialogView;
     private AlertDialog alertDialog;
-    private TextView seminarNameTextView;
-    private ImageButton closeDialogButton;
     private Button qrCodeButton;
 
     @Override
@@ -122,8 +120,6 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
     }
 
     private void initializeDialogComponents() {
-        this.seminarNameTextView = (TextView) this.dialogView.findViewById(R.id.tv_seminar_name_details_student);
-        this.closeDialogButton = (ImageButton) this.dialogView.findViewById(R.id.btn_close_student);
         this.qrCodeButton = (Button) this.dialogView.findViewById(R.id.btn_qr_code_student);
     }
 
@@ -156,7 +152,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
     @Override
     public void onSeminarClick(final Seminar seminar) {
-        this.seminarNameTextView.setText(seminar.getName());
+        this.alertDialog.setTitle(seminar.getName());
 
         this.qrCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,13 +162,6 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                 intent.putExtra("name", seminar.getName());
                 intent.putExtra("nusp", nusp);
                 startActivity(intent);
-            }
-        });
-
-        this.closeDialogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
             }
         });
 
