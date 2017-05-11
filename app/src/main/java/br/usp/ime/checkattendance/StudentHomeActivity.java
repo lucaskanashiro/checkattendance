@@ -21,11 +21,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -35,6 +30,7 @@ import br.usp.ime.checkattendance.fragments.SeminarsFragment;
 import br.usp.ime.checkattendance.models.Seminar;
 import br.usp.ime.checkattendance.utils.ClickListener;
 import br.usp.ime.checkattendance.utils.NetworkController;
+import br.usp.ime.checkattendance.utils.Parser;
 import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
@@ -42,7 +38,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
     private String nusp;
     private String allSeminars;
-    private String attendedSeminars;
+    private String attendedSeminarsId;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
     private TabLayout tabLayout;
@@ -52,6 +48,8 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
     private View dialogView;
     private AlertDialog alertDialog;
     private Button qrCodeButton;
+
+    private final int REFRESH = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,26 +61,29 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
         this.networkController = new NetworkController();
 
-        this.networkController.getAllSeminars(this, new ServerCallback() {
-                    @Override
-                    public void onSuccess(String response) {
-                        allSeminars = response;
-                        setupViewPager();
-                        setupTabLayout();
-                    }
-
-                    @Override
-                    public void onError() {
-                        String message = "Sorry, we cannot fetch seminars data";
-                        Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
-                    }
-                }
-        );
-
         this.networkController.getAttendedSeminars(this.nusp, this, new ServerCallback() {
             @Override
             public void onSuccess(String response) {
-                attendedSeminars = response;
+                try {
+                    attendedSeminarsId = Parser.parseAttendedSeminars(response);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                networkController.getAllSeminars(StudentHomeActivity.this, new ServerCallback() {
+                            @Override
+                            public void onSuccess(String response) {
+                                allSeminars = response;
+                                setupViewPager();
+                                setupTabLayout();
+                            }
+
+                            @Override
+                            public void onError() {
+                                String message = "Sorry, we cannot fetch seminars data";
+                                Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                );
             }
 
             @Override
@@ -99,7 +100,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
     private void setupViewPager() {
         this.viewPager = (ViewPager) findViewById(R.id.viewpager);
         this.pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
-                StudentHomeActivity.this, this.allSeminars, this.attendedSeminars);
+                StudentHomeActivity.this, this.allSeminars, this.attendedSeminarsId);
         this.viewPager.setAdapter(pagerAdapter);
     }
 
@@ -161,7 +162,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                 intent.putExtra("id", seminar.getId());
                 intent.putExtra("name", seminar.getName());
                 intent.putExtra("nusp", nusp);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -169,18 +170,80 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
         this.alertDialog.show();
     }
 
-    class PagerAdapter extends FragmentPagerAdapter {
-        String tabTitles[] = new String[] { "Attended Seminars", "All Seminars"};
-        Context context;
-        String seminars;
-        String attendedSeminars;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == REFRESH) {
+            this.updateFragmentsData();
+            this.alertDialog.dismiss();
+        }
+    }
+
+    private void updateFragmentsData() {
+        this.networkController.getAttendedSeminars(this.nusp, this, new ServerCallback() {
+            @Override
+            public void onSuccess(String response) {
+                if(response.contains("\"success\":true")) {
+                    try {
+                        attendedSeminarsId = Parser.parseAttendedSeminars(response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    pagerAdapter.getAttendedSeminarsFragment().setData(response);
+                } else {
+                    String message = "We had some problems to fetch your attended seminar, sorry";
+                    Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError() {}
+        });
+    }
+
+    public class PagerAdapter extends FragmentPagerAdapter {
+        private String tabTitles[] = new String[] { "Attended Seminars", "All Seminars"};
+        private Context context;
+        private String seminars;
+        private String attendedSeminarsId;
+        private SeminarsFragment seminarsFragment;
+        private AttendedSeminarsFragment attendedSeminarsFragment;
 
         public PagerAdapter(FragmentManager fm, Context context, String seminars,
-                            String attendedSeminars) {
+                            String attendedSeminarsId) {
             super(fm);
             this.context = context;
             this.seminars = seminars;
-            this.attendedSeminars = attendedSeminars;
+            this.attendedSeminarsId = attendedSeminarsId;
+            this.seminarsFragment = new SeminarsFragment();
+            this.attendedSeminarsFragment = new AttendedSeminarsFragment();
+
+            this.setupSeminarsFragment();
+            this.setupAttendedSeminarsFragment();
+        }
+
+        public SeminarsFragment getSeminarsFragment() {
+            return this.seminarsFragment;
+        }
+
+        public AttendedSeminarsFragment getAttendedSeminarsFragment() {
+            return this.attendedSeminarsFragment;
+        }
+
+        private void setupSeminarsFragment() {
+            Bundle args = new Bundle();
+            args.putString("response", seminars);
+            args.putString("type", "student");
+
+            this.seminarsFragment.setArguments(args);
+            this.seminarsFragment.setListener(StudentHomeActivity.this);
+        }
+
+        private void setupAttendedSeminarsFragment() {
+            Bundle args = new Bundle();
+            args.putString("response", attendedSeminarsId);
+            args.putString("allSeminars", seminars);
+
+            this.attendedSeminarsFragment.setArguments(args);
         }
 
         @Override
@@ -193,19 +256,9 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
             switch (position) {
                 case 0:
-                    Fragment attendedSeminarFragment = new AttendedSeminarsFragment();
-                    Bundle args = new Bundle();
-                    args.putString("response", attendedSeminars);
-                    attendedSeminarFragment.setArguments(args);
-                    return attendedSeminarFragment;
+                    return this.attendedSeminarsFragment;
                 case 1:
-                    SeminarsFragment seminarFragment = new SeminarsFragment();
-                    Bundle args2 = new Bundle();
-                    args2.putString("response", seminars);
-                    args2.putString("type", "student");
-                    seminarFragment.setArguments(args2);
-                    seminarFragment.setListener(StudentHomeActivity.this);
-                    return seminarFragment;
+                    return this.seminarsFragment;
             }
 
             return null;

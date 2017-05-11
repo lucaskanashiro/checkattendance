@@ -7,7 +7,12 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import br.usp.ime.checkattendance.RegisterActivity;
 
@@ -35,13 +40,6 @@ public class NetworkController {
 
         String url = "http://207.38.82.139:8001/seminar";
         this.get(url, context, callback);
-    }
-
-    public void getAttendedSeminars(String nusp, Context context, ServerCallback callback) {
-
-        String url = "http://207.38.82.139:8001/attendence/listSeminars";
-        String params = "nusp=" + nusp;
-        this.post(url, params, context, callback);
     }
 
     public void getStudentData(String nusp, Context context, ServerCallback callback){
@@ -97,6 +95,13 @@ public class NetworkController {
 
         String url = "http://207.38.82.139:8001/attendence/submit";
         String params = "nusp=" + nusp + "&seminar_id=" + seminarId;
+        this.post(url, params, context, callback);
+    }
+
+    public void getAttendedSeminars(String nusp, Context context, ServerCallback callback) {
+
+        String url = "http://207.38.82.139:8001/attendence/listSeminars";
+        String params = "nusp=" + nusp;
         this.post(url, params, context, callback);
     }
 

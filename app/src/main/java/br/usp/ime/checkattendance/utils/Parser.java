@@ -1,5 +1,7 @@
 package br.usp.ime.checkattendance.utils;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,9 +31,41 @@ public class Parser {
         return seminars;
     }
 
+    public static String parseAttendedSeminars(String seminars) throws JSONException {
+        String result = "";
+
+        JSONObject json = new JSONObject(seminars);
+        JSONArray data = json.getJSONArray("data");
+
+        for(int i = 0; i < data.length(); i++) {
+            JSONObject seminar = data.getJSONObject(i);
+            result = result + seminar.get("seminar_id") + " ";
+        }
+
+        return result;
+    }
+
+    public static Seminar parseSingleSeminar(String response) throws JSONException {
+        JSONObject json = new JSONObject(response);
+        JSONObject data = json.getJSONObject("data");
+        return new Seminar(data.getString("id"), data.getString("name"));
+    }
+
     public static String parseData(String response, String field) throws JSONException {
         JSONObject json = new JSONObject(response);
         JSONObject data = json.getJSONObject("data");
         return data.getString(field);
+    }
+
+    public static ArrayList<Seminar> parseStringResponse(String seminarsString) {
+        ArrayList<Seminar> seminarArrayList = new ArrayList<Seminar>();
+
+        try {
+            seminarArrayList = Parser.parseSeminars(seminarsString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return seminarArrayList;
     }
 }

@@ -15,12 +15,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import br.usp.ime.checkattendance.R;
 import br.usp.ime.checkattendance.adapters.SeminarAdapter;
 import br.usp.ime.checkattendance.models.Seminar;
 import br.usp.ime.checkattendance.utils.ClickListener;
+import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.Parser;
+import br.usp.ime.checkattendance.utils.ServerCallback;
 
 /**
  * Created by kanashiro on 5/6/17.
@@ -29,11 +34,24 @@ import br.usp.ime.checkattendance.utils.Parser;
 public class AttendedSeminarsFragment extends Fragment {
 
     private ArrayList<Seminar> attendedSeminars;
-    private String seminars;
+    private String seminarsId;
+    private String allSeminars;
     private ClickListener listener;
+    private View rootView;
+    private RecyclerView recyclerView;
+    private SeminarAdapter adapter;
+    private LinearLayoutManager linearLayoutManager;
+    private NetworkController networkController;
+    private String[] seminarIdsArray;
+    private ArrayList<Seminar> seminars;
 
     public AttendedSeminarsFragment() {
         this.attendedSeminars = new ArrayList<Seminar>();
+        this.listener = new ClickListener() {
+            @Override
+            public void onSeminarClick(Seminar seminar) {}
+        };
+        this.networkController = new NetworkController();
     }
 
     @Override
@@ -41,40 +59,73 @@ public class AttendedSeminarsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        this.seminars = args.getString("response");
+        this.seminarsId = args.getString("response");
+        this.allSeminars = args.getString("allSeminars");
         this.attendedSeminars = new ArrayList<Seminar>();
-    }
-
-    public void setListener(ClickListener listener) {
-        this.listener = listener;
+        this.seminars = new ArrayList<Seminar>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_attended_seminars, container, false);
+        this.inflateLayout(inflater, container);
+        this.parseAttendedSeminars();
+        return this.rootView;
+    }
 
-        RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view_attended);
-        rv.setHasFixedSize(true);
+    private void setupFragment() {
+        this.adapter = new SeminarAdapter(this.attendedSeminars, "student", this.listener);
+        this.linearLayoutManager = new LinearLayoutManager(getActivity());
+        this.setupRecyclerView();
+    }
 
-        if (this.seminars != null) {
-            try {
-                this.attendedSeminars = Parser.parseSeminars(this.seminars);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Toast.makeText(getContext(), "You did not attended any seminar", Toast.LENGTH_LONG).show();
+    private Seminar findSeminar(String id) {
+        for (Seminar s : this.seminars) {
+            if (s.getId().equals(id))
+                return s;
         }
+        return null;
+    }
+
+    private void parseAttendedSeminars() {
+        if (this.seminarsId != null) {
+            this.attendedSeminars.clear();
+            this.seminarIdsArray = seminarsId.split("\\s+");
+            this.seminars = Parser.parseStringResponse(this.allSeminars);
+
+            for(int i=0; i < seminarIdsArray.length; i++) {
+                Seminar s = findSeminar(seminarIdsArray[i]);
+                if (s != null)
+                    this.attendedSeminars.add(s);
+            }
+
+            this.setupFragment();
+        }
+    }
+
+    private void inflateLayout(LayoutInflater inflater, ViewGroup container) {
+        this.rootView = inflater.inflate(R.layout.fragment_attended_seminars, container, false);
+    }
+
+    private void setupRecyclerView() {
+        this.recyclerView = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view_attended);
+        this.recyclerView.setHasFixedSize(true);
+        this.recyclerView.setAdapter(adapter);
+        this.recyclerView.setLayoutManager(this.linearLayoutManager);
+    }
+
+    public void setData(String seminars) {
+        try {
+            this.seminarsId = Parser.parseAttendedSeminars(seminars);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        this.parseAttendedSeminars();
 
         SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars, "student", this.listener);
-        rv.setAdapter(adapter);
-
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        rv.setLayoutManager(llm);
-
-        return rootView;
+        this.recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
 }

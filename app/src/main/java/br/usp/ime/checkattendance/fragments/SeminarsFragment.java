@@ -75,7 +75,7 @@ public class SeminarsFragment extends Fragment {
 
         this.inflateLayout(inflater, container);
 
-        this.seminars = this.parseStringResponse(this.allSeminars);
+        this.seminars = Parser.parseStringResponse(this.allSeminars);
 
         this.adapter = new SeminarAdapter(this.seminars, this.type, this.listener);
         this.linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -99,20 +99,8 @@ public class SeminarsFragment extends Fragment {
         this.recyclerView.setLayoutManager(this.linearLayoutManager);
     }
 
-    private ArrayList<Seminar> parseStringResponse(String seminarsString) {
-        ArrayList<Seminar> seminarArrayList = new ArrayList<Seminar>();
-
-        try {
-            seminarArrayList = Parser.parseSeminars(seminarsString);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return seminarArrayList;
-    }
-
     public void setData(String seminars) {
-        ArrayList<Seminar> allSeminars= this.parseStringResponse(seminars);
+        ArrayList<Seminar> allSeminars= Parser.parseStringResponse(seminars);
 
         SeminarAdapter adapter = new SeminarAdapter(allSeminars, this.type, this.listener);
         this.recyclerView.setAdapter(adapter);
