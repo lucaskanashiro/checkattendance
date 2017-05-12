@@ -31,7 +31,8 @@
         <activity android:name=".RegisterSeminarActivity" />
         <activity android:name=".UpdateSeminarActivity" />
         <activity android:name=".TeacherQRCodeActivity" />
-        <activity android:name=".StudentQRCodeActivity"></activity>
+        <activity android:name=".StudentQRCodeActivity" />
+        <activity android:name=".ListAttendeesActivity"></activity>
     </application>
 
 </manifest>

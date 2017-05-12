@@ -105,6 +105,19 @@ public class NetworkController {
         this.post(url, params, context, callback);
     }
 
+    public void getAttendees(String seminarId, Context context, ServerCallback callback) {
+
+        String url = "http://207.38.82.139:8001/attendence/listStudents";
+        String params = "seminar_id=" + seminarId;
+        this.post(url, params, context, callback);
+    }
+
+    public void getAllStudents(Context context, ServerCallback callback) {
+
+        String url = "http://207.38.82.139:8001/student";
+        this.get(url, context, callback);
+    }
+
     private void get(String url, Context context, final ServerCallback callback) {
 
         StringRequest request = new StringRequest(Request.Method.GET, url,

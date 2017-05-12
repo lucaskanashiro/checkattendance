@@ -25,6 +25,16 @@
         android:text="Bluetooth" />
 
     <Button
+        android:id="@+id/btn_list_attendees"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_assignment_turned_in_black_24dp"
+        android:background="@color/colorAccent"
+        android:textColor="#ffffff"
+        android:layout_margin="10dp"
+        android:text="List attendees" />
+
+    <Button
         android:id="@+id/btn_edit_seminar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

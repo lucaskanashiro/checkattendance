@@ -41,6 +41,7 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     private AlertDialog alertDialog;
     private Button editSeminarButton;
     private Button qrCodeButton;
+    private Button listAttendeesButton;
 
     private final static int REFRESH_PAGE = 1;
 
@@ -89,6 +90,7 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     private void initializeDialogComponents() {
         this.editSeminarButton = (Button) this.dialogView.findViewById(R.id.btn_edit_seminar);
         this.qrCodeButton = (Button) this.dialogView.findViewById(R.id.btn_qr_code_teacher);
+        this.listAttendeesButton = (Button) this.dialogView.findViewById(R.id.btn_list_attendees);
     }
 
     private void createDialog() {
@@ -175,6 +177,15 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
                 Intent intent = new Intent(TeacherHomeActivity.this, UpdateSeminarActivity.class);
                 intent.putExtra("id", seminar.getId());
                 startActivityForResult(intent, 0);
+            }
+        });
+
+        this.listAttendeesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TeacherHomeActivity.this, ListAttendeesActivity.class);
+                intent.putExtra("seminarId", seminar.getId());
+                startActivity(intent);
             }
         });
 
