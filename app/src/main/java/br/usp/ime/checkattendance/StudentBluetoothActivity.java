@@ -36,6 +36,9 @@ public class StudentBluetoothActivity extends AppCompatActivity {
     private final int MSG_TO_READ = 0;
     private final int MSG_TOAST = 8;
 
+    private final int REFRESH = 0;
+    private final int NOT_REFRESH = 1;
+
     private String seminarId;
     private String seminarName;
     private String nusp;
@@ -69,6 +72,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             this.thread.cancel();
+            setResult(NOT_REFRESH);
             finish();
         }
 
@@ -101,10 +105,12 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                 if (response.contains("\"success\":true")) {
                     String message = "Your attendance for this seminar was confirmed";
                     Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                    setResult(REFRESH);
                     finish();
                 } else {
                     String message = "We had some problem during your attendance confirmation. Please, try again later";
                     Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                    setResult(NOT_REFRESH);
                     finish();
                 }
             }
@@ -113,6 +119,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             public void onError() {
                 String message = "We had some network problem. Please, try again later";
                 Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                setResult(NOT_REFRESH);
                 finish();
             }
         });
@@ -138,6 +145,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                     else {
                         String m = "The scanned seminar isn't the same that you selected. Try again";
                         Toast.makeText(StudentBluetoothActivity.this, m, Toast.LENGTH_LONG).show();
+                        setResult(NOT_REFRESH);
                         finish();
                     }
                 }
@@ -156,6 +164,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
 
         if (this.adapter == null) {
             Toast.makeText(this, "Bluetooth not available", Toast.LENGTH_SHORT).show();
+            setResult(NOT_REFRESH);
             finish();
         }
 

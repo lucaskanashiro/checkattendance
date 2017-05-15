@@ -175,7 +175,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                 intent.putExtra("id", seminar.getId());
                 intent.putExtra("name", seminar.getName());
                 intent.putExtra("nusp", nusp);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
 
