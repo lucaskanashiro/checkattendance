@@ -10,15 +10,24 @@
         android:id="@+id/tv_seminar_name_bluetooth_teacher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:textSize="22sp"
-        android:layout_margin="20dp"/>
+        android:layout_margin="20dp"
+        android:layout_gravity="center_vertical"
+        android:textSize="22sp" />
 
     <TextView
-        android:id="@+id/tv_bluetooth_students_count"
+        android:id="@+id/tv_bluetooth_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_gravity="center_vertical"
         android:textSize="22sp"
-        android:layout_margin="20dp"/>
+        android:layout_margin="20dp"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        android:background="@color/colorAccent"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="20dp"
+        android:src="@drawable/ic_bluetooth_searching_black_24dp"/>
 </LinearLayout>

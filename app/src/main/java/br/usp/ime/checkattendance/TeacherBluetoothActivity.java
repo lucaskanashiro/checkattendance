@@ -6,9 +6,11 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,17 +36,37 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
     private AcceptThread thread;
 
     private TextView tv_seminar_name;
-    private TextView tv_count_attendees;
+    private TextView tv_bluetooth_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_bluetooth);
 
+        this.setupActionBar();
         this.getSentData();
-        this.initializeUIComponents();
         this.checkBluetoothState();
+        this.initializeUIComponents();
         this.runThread();
+    }
+
+    private void setupActionBar() {
+        ActionBar actionBar = this.getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setTitle("Seminar authentication");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.thread.cancel();
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void getSentData() {
@@ -55,9 +77,9 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
 
     private void initializeUIComponents() {
         this.tv_seminar_name = (TextView) findViewById(R.id.tv_seminar_name_bluetooth_teacher);
-        this.tv_seminar_name.setText(this.seminarName);
-        this.tv_count_attendees = (TextView) findViewById(R.id.tv_bluetooth_students_count);
-        this.updateCounter();
+        this.tv_seminar_name.setText(this.seminarName + "\n\nYou are accepting connections to send the seminar's token for students via bluetooth");
+        this.tv_bluetooth_name = (TextView) findViewById(R.id.tv_bluetooth_name);
+        this.tv_bluetooth_name.setText("Attendees should connect with: " + this.adapter.getName());
     }
 
     private void checkBluetoothState() {
@@ -75,10 +97,6 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
     private void runThread() {
         this.thread = new AcceptThread();
         this.thread.start();
-    }
-
-    private void updateCounter() {
-        this.tv_count_attendees.setText("Attendees: " + this.counter);
     }
 
     private class AcceptThread extends Thread {
@@ -122,8 +140,6 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
                         try {
                             mmOutStream.write(msgBuffer);
                             Log.d("WRITING..", msgBuffer.toString());
-                            counter++;
-                            //updateCounter();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
