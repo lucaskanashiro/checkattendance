@@ -7,9 +7,11 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,8 +45,28 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_bluetooth);
 
+        this.setupActionBar();
         this.getSentData();
         this.initializeUIComponents();
+    }
+
+    private void setupActionBar() {
+        ActionBar actionBar = this.getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setTitle("Seminar authentication");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.thread.cancel();
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void getSentData() {
@@ -108,7 +130,8 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         }
 
         try {
-            this.socket.connect();
+            if (!this.socket.isConnected())
+                this.socket.connect();
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Cannot connect via socket", Toast.LENGTH_SHORT).show();
@@ -116,6 +139,8 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                 this.socket.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
+            } finally {
+                this.socket = null;
             }
         }
 
@@ -128,6 +153,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
         private Handler handler;
+        private BluetoothSocket socket;
 
         public ConnectedThread(BluetoothSocket socket, Handler handler) {
             InputStream tmpIn = null;
@@ -143,6 +169,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             this.mmInStream = tmpIn;
             this.mmOutStream = tmpOut;
             this.handler = handler;
+            this.socket = socket;
         }
 
         public void run() {
@@ -171,6 +198,15 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                 bundle.putString("toast", "Unable to connect device");
                 msg.setData(bundle);
                 this.handler.sendMessage(msg);
+            }
+        }
+
+        public void cancel() {
+            try {
+                this.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("SOCKET", "Could not close the connect socket", e);
             }
         }
     }
