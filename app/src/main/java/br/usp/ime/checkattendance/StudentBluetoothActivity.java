@@ -21,6 +21,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import br.usp.ime.checkattendance.utils.NetworkController;
+import br.usp.ime.checkattendance.utils.ServerCallback;
+
 public class StudentBluetoothActivity extends AppCompatActivity {
 
     private static final UUID appUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B1527");
@@ -35,8 +38,10 @@ public class StudentBluetoothActivity extends AppCompatActivity {
 
     private String seminarId;
     private String seminarName;
+    private String nusp;
     private String mac_address_to_connect;
     private String seminarIdRead;
+    private NetworkController networkController;
 
     private TextView tv_seminar_name;
 
@@ -46,6 +51,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         setContentView(R.layout.activity_student_bluetooth);
 
         this.setupActionBar();
+        this.networkController = new NetworkController();
         this.getSentData();
         this.initializeUIComponents();
     }
@@ -73,6 +79,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         Intent intent = getIntent();
         this.seminarId = intent.getStringExtra("id");
         this.seminarName = intent.getStringExtra("name");
+        this.nusp = intent.getStringExtra("nusp");
     }
 
     private void initializeUIComponents() {
@@ -85,6 +92,30 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         intent.putExtra("id", this.seminarId);
         intent.putExtra("name", this.seminarName);
         startActivityForResult(intent, 0);
+    }
+
+    private void confirmPresenceInSeminar(String seminarId) {
+        this.networkController.confirmAttendance(this.nusp, seminarId, this, new ServerCallback() {
+            @Override
+            public void onSuccess(String response) {
+                if (response.contains("\"success\":true")) {
+                    String message = "Your attendance for this seminar was confirmed";
+                    Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                    finish();
+                } else {
+                    String message = "We had some problem during your attendance confirmation. Please, try again later";
+                    Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onError() {
+                String message = "We had some network problem. Please, try again later";
+                Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
     }
 
     @Override
@@ -101,6 +132,14 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                 if (msg.what == MSG_TO_READ) {
                     seminarIdRead = (String) msg.obj;
                     Log.d("SEMINAR ID READED", seminarIdRead);
+                    Log.d("SEMINAR ID RECEIVED", seminarId);
+                    if (seminarIdRead.equals(seminarId))
+                        confirmPresenceInSeminar(seminarId);
+                    else {
+                        String m = "The scanned seminar isn't the same that you selected. Try again";
+                        Toast.makeText(StudentBluetoothActivity.this, m, Toast.LENGTH_LONG).show();
+                        finish();
+                    }
                 }
                 if (msg.what == MSG_TOAST) {
                     String message = (String) msg.obj;
@@ -130,8 +169,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         }
 
         try {
-            if (!this.socket.isConnected())
-                this.socket.connect();
+            this.socket.connect();
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Cannot connect via socket", Toast.LENGTH_SHORT).show();

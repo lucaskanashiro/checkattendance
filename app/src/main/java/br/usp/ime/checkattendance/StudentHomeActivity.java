@@ -174,6 +174,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                 Intent intent = new Intent(StudentHomeActivity.this, StudentBluetoothActivity.class);
                 intent.putExtra("id", seminar.getId());
                 intent.putExtra("name", seminar.getName());
+                intent.putExtra("nusp", nusp);
                 startActivity(intent);
             }
         });
