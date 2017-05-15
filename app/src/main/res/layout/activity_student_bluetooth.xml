@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="br.usp.ime.checkattendance.StudentBluetoothActivity">
+
+    <TextView
+        android:id="@+id/tv_seminar_name_bluetooth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="22sp"/>
+
+    <Button
+        android:id="@+id/btn_scan_bluetooth_devices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:textColor="#ffffff"
+        android:layout_margin="10dp"
+        android:drawableLeft="@drawable/ic_bluetooth_searching_black_24dp"
+        android:text="Scan bluetooth devices"
+        android:onClick="scanDevices"/>
+
+</LinearLayout>

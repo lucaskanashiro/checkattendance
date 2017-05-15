@@ -48,6 +48,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
     private View dialogView;
     private AlertDialog alertDialog;
     private Button qrCodeButton;
+    private Button bluetoothButton;
 
     private final int REFRESH = 0;
 
@@ -122,6 +123,7 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
     private void initializeDialogComponents() {
         this.qrCodeButton = (Button) this.dialogView.findViewById(R.id.btn_qr_code_student);
+        this.bluetoothButton = (Button) this.dialogView.findViewById(R.id.btn_bluetooth_student);
     }
 
     private void createDialog() {
@@ -163,6 +165,16 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                 intent.putExtra("name", seminar.getName());
                 intent.putExtra("nusp", nusp);
                 startActivityForResult(intent, 0);
+            }
+        });
+
+        this.bluetoothButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StudentHomeActivity.this, StudentBluetoothActivity.class);
+                intent.putExtra("id", seminar.getId());
+                intent.putExtra("name", seminar.getName());
+                startActivity(intent);
             }
         });
 
