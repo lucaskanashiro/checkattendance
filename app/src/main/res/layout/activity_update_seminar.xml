@@ -12,7 +12,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:text="Name"/>
+        android:text="@string/name"/>
 
     <EditText
         android:id="@+id/et_seminar_name_update"
@@ -21,12 +21,12 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:focusable="true"
-        android:hint="Name" />
+        android:hint="@string/name_hint" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Update"
+        android:text="@string/update"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:onClick="updateSeminar"/>

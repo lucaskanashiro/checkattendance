@@ -12,7 +12,7 @@
         android:background="@color/colorAccent"
         android:textColor="#ffffff"
         android:layout_margin="10dp"
-        android:text="QR code" />
+        android:text="@string/qr_code" />
 
     <Button
         android:id="@+id/btn_bluetooth_teacher"
@@ -22,7 +22,7 @@
         android:background="@color/colorAccent"
         android:textColor="#ffffff"
         android:layout_margin="10dp"
-        android:text="Bluetooth" />
+        android:text="@string/bluetooth" />
 
     <Button
         android:id="@+id/btn_list_attendees"
@@ -32,7 +32,7 @@
         android:background="@color/colorAccent"
         android:textColor="#ffffff"
         android:layout_margin="10dp"
-        android:text="List attendees" />
+        android:text="@string/list_attendees" />
 
     <Button
         android:id="@+id/btn_edit_seminar"
@@ -42,6 +42,6 @@
         android:background="@color/colorAccent"
         android:textColor="#ffffff"
         android:layout_margin="10dp"
-        android:text="Edit" />
+        android:text="@string/edit" />
 
 </LinearLayout>

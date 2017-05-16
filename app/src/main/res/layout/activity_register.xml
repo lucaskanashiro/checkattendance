@@ -14,13 +14,13 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="20dp"
         android:focusable="true"
-        android:hint="Name" />
+        android:hint="@string/name_hint" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/et_nusp_register"
-        android:hint="NUSP"
+        android:hint="@string/nusp_hint"
         android:focusable="true"
         android:inputType="number"
         android:layout_marginLeft="10dp"
@@ -32,14 +32,14 @@
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/passwd_hint"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Register"
+        android:text="@string/register"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:onClick="signUp"/>

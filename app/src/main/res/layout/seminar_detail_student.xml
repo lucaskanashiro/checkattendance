@@ -12,7 +12,7 @@
         android:background="@color/colorAccent"
         android:textColor="#ffffff"
         android:layout_margin="10dp"
-        android:text="QR code" />
+        android:text="@string/qr_code" />
 
     <Button
         android:id="@+id/btn_bluetooth_student"
@@ -22,6 +22,6 @@
         android:background="@color/colorAccent"
         android:textColor="#ffffff"
         android:layout_margin="10dp"
-        android:text="Bluetooth" />
+        android:text="@string/bluetooth" />
 
 </LinearLayout>

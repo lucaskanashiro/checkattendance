@@ -22,7 +22,7 @@
         android:textColor="#ffffff"
         android:layout_margin="10dp"
         android:drawableLeft="@drawable/ic_bluetooth_searching_black_24dp"
-        android:text="Scan bluetooth devices"
+        android:text="@string/bluetooth_choose_device"
         android:onClick="scanDevices"/>
 
 </LinearLayout>

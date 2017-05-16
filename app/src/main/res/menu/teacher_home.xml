@@ -6,17 +6,17 @@
         android:id="@+id/item_edit_teacher"
         app:showAsAction="never"
         android:orderInCategory="100"
-        android:title="Update Profile" />
+        android:title="@string/update_profile" />
 
     <item
         android:id="@+id/item_register_teacher"
         app:showAsAction="never"
         android:orderInCategory="100"
-        android:title="Register Teacher" />
+        android:title="@string/register_teacher" />
 
     <item
         android:id="@+id/item_teacher_logout"
         app:showAsAction="never"
         android:orderInCategory="100"
-        android:title="Logout" />
+        android:title="@string/logout" />
 </menu>

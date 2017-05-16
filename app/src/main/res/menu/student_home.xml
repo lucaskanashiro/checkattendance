@@ -6,11 +6,11 @@
         android:id="@+id/student_edit_profile"
         app:showAsAction="never"
         android:orderInCategory="100"
-        android:title="Update Profile" />
+        android:title="@string/update_profile" />
 
     <item
         android:id="@+id/student_logout"
         app:showAsAction="never"
         android:orderInCategory="100"
-        android:title="Logout" />
+        android:title="@string/logout" />
 </menu>

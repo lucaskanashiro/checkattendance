@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">CheckAttendance</string>
-    <string name="register"><u><b><i>Cadastre-se</i></b></u></string>
+    <string name="register_login"><u><b><i>Register</i></b></u></string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="nusp_hint">NUSP</string>
+    <string name="passwd_hint">Password</string>
+    <string name="name_hint">Name</string>
+
+    <string name="nusp_form">NUSP</string>
+    <string name="name">Name</string>
+    <string name="passwd">Password</string>
+    <string name="update">Update</string>
 
     <string name="teacher">teacher</string>
     <string name="student">student</string>
@@ -68,9 +78,23 @@
     <string name="bluetooth_select_device">Select a device</string>
     <string name="bluetooth_no_device">No devices found</string>
 
+    <string name="bluetooth_paired_devices">Paired Bluetooth Devices</string>
+    <string name="bluetooth_other_devices">Other Bluetooth Devices</string>
+    <string name="bluetooth_scan">Scan</string>
+    <string name="bluetooth_choose_device">Choose bluetooth device</string>
+
     <string name="qr_code_title">Scan QR code</string>
     <string name="qr_code_prompt_camera">Scan the seminar QR code</string>
     <string name="cancel_qr_code_scan">Cancelled QR code scan</string>
     <string name="qr_code_format">QR_CODE</string>
     <string name="qr_code_format_not_supported">Format not supported. Try again</string>
+
+    <string name="qr_code">QR code</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="list_attendees">List attendees</string>
+    <string name="edit">Edit</string>
+
+    <string name="update_profile">Update Profile</string>
+    <string name="logout">Logout</string>
+    <string name="register_teacher">Register Teacher</string>
 </resources>

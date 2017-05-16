@@ -12,7 +12,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:text="Name"/>
+        android:text="@string/name"/>
 
     <EditText
         android:id="@+id/et_name_edit"
@@ -21,7 +21,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:focusable="true"
-        android:hint="Name" />
+        android:hint="@string/name_hint" />
 
     <TextView
         android:layout_width="match_parent"
@@ -29,13 +29,13 @@
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:text="NUSP"/>
+        android:text="@string/nusp_form"/>
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/et_nusp_edit"
-        android:hint="NUSP"
+        android:hint="@string/nusp_hint"
         android:focusable="true"
         android:inputType="number"
         android:layout_marginLeft="10dp"
@@ -47,7 +47,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:text="Password"/>
+        android:text="@string/passwd"/>
 
     <EditText
         android:id="@+id/et_passwd_edit"
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/passwd_hint"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"/>
 
@@ -63,7 +63,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Update"
+        android:text="@string/update"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:onClick="updateProfile"/>
