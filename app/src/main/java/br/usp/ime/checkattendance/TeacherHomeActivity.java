@@ -27,8 +27,6 @@ import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class TeacherHomeActivity extends AppCompatActivity implements ClickListener {
-
-    private Seminar seminarInstance;
     private String nusp;
     private String allSeminars;
     private ViewPager viewPager;
@@ -52,7 +50,6 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
         setContentView(R.layout.activity_teacher_home);
 
         this.getSentData();
-
         this.networkController = new NetworkController();
         this.setupSeminars();
         this.setupDialogView();
@@ -61,7 +58,11 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.nusp = intent.getStringExtra("nusp");
+        this.nusp = intent.getStringExtra(getString(R.string.nusp));
+    }
+
+    private void showMessage(String message, int duration) {
+        Toast.makeText(TeacherHomeActivity.this, message, duration).show();
     }
 
     private void setupSeminars() {
@@ -75,8 +76,7 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
                     @Override
                     public void onError() {
-                        String message = "Sorry, we cannot fetch seminars data";
-                        Toast.makeText(TeacherHomeActivity.this, message, Toast.LENGTH_LONG).show();
+                        showMessage(getString(R.string.cannot_fetch_seminars), Toast.LENGTH_LONG);
                     }
                 }
         );
@@ -112,14 +112,14 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
         if (id == R.id.item_register_teacher) {
             Intent intent = new Intent(TeacherHomeActivity.this, RegisterActivity.class);
-            intent.putExtra("type", "teacher");
+            intent.putExtra(getString(R.string.type), getString(R.string.teacher));
             startActivity(intent);
         } else if (id == R.id.item_teacher_logout) {
             finish();
         } else if (id == R.id.item_edit_teacher) {
             Intent intent = new Intent(TeacherHomeActivity.this, UpdateProfileActivity.class);
-            intent.putExtra("type", "teacher");
-            intent.putExtra("nusp", this.nusp);
+            intent.putExtra(getString(R.string.type), getString(R.string.teacher));
+            intent.putExtra(getString(R.string.nusp), this.nusp);
             startActivity(intent);
         }
 
@@ -129,7 +129,7 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
     private void setupViewPager() {
         this.viewPager = (ViewPager) findViewById(R.id.viewpager);
         this.pagerAdapter = new TeacherHomeActivity.PagerAdapter(getSupportFragmentManager(),
-                TeacherHomeActivity.this, this.allSeminars);
+                this.allSeminars);
         this.viewPager.setAdapter(pagerAdapter);
     }
 
@@ -169,47 +169,60 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
         });
     }
 
-    @Override
-    public void onSeminarClick(final Seminar seminar) {
-        this.alertDialog.setTitle(seminar.getName());
-
+    private void editSeminarClickListener(final String seminarId) {
         this.editSeminarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TeacherHomeActivity.this, UpdateSeminarActivity.class);
-                intent.putExtra("id", seminar.getId());
+                intent.putExtra(getString(R.string.seminar_id), seminarId);
                 startActivityForResult(intent, 0);
             }
         });
+    }
 
+    private void listAttendeesClickListener(final String seminarId) {
         this.listAttendeesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TeacherHomeActivity.this, ListAttendeesActivity.class);
-                intent.putExtra("seminarId", seminar.getId());
+                intent.putExtra(getString(R.string.seminar_id), seminarId);
                 startActivity(intent);
             }
         });
+    }
 
+    private void qrCodeClickListener(final String seminarId, final String seminarName) {
         this.qrCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TeacherHomeActivity.this, TeacherQRCodeActivity.class);
-                intent.putExtra("id", seminar.getId());
-                intent.putExtra("name", seminar.getName());
+                intent.putExtra(getString(R.string.seminar_id), seminarId);
+                intent.putExtra(getString(R.string.seminar_name), seminarName);
                 startActivity(intent);
             }
         });
+    }
 
+    private void bluetoothClickListener(final String seminarId, final String seminarName) {
         this.bluetoothButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TeacherHomeActivity.this, TeacherBluetoothActivity.class);
-                intent.putExtra("id", seminar.getId());
-                intent.putExtra("name", seminar.getName());
+                intent.putExtra(getString(R.string.seminar_id), seminarId);
+                intent.putExtra(getString(R.string.seminar_name), seminarName);
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onSeminarClick(final Seminar seminar) {
+        this.alertDialog.setTitle(seminar.getName());
+
+        this.editSeminarClickListener(seminar.getId());
+        this.listAttendeesClickListener(seminar.getId());
+        this.qrCodeClickListener(seminar.getId(), seminar.getName());
+        this.bluetoothClickListener(seminar.getId(), seminar.getName());
 
         this.alertDialog.setView(this.dialogView);
         this.alertDialog.show();
@@ -217,14 +230,12 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
     public class PagerAdapter extends FragmentPagerAdapter {
         private String tabTitles[] = new String[] {"Seminars"};
-        private Context context;
         private String seminars;
         private Bundle args;
         private SeminarsFragment fragment;
 
-        public PagerAdapter(FragmentManager fm, Context context, String seminars) {
+        public PagerAdapter(FragmentManager fm, String seminars) {
             super(fm);
-            this.context = context;
             this.seminars = seminars;
 
             this.setupFragmentArgs();
@@ -237,8 +248,8 @@ public class TeacherHomeActivity extends AppCompatActivity implements ClickListe
 
         private void setupFragmentArgs() {
             this.args = new Bundle();
-            args.putString("response", seminars);
-            args.putString("type", "teacher");
+            args.putString(getString(R.string.response), seminars);
+            args.putString(getString(R.string.type), getString(R.string.teacher));
         }
 
         private void setupFragments() {
