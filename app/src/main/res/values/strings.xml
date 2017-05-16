@@ -26,6 +26,7 @@
     <string name="cannot_connect_socket">Socket\'s connect() method failed</string>
     <string name="cannot_get_socket">Socket\'s listen() method failed</string>
     <string name="writing">Writing: </string>
+    <string name="reading">Reading: </string>
 
     <string name="bluetooth_teacher_accepting_connections">\n\nYou are accepting connections to send the seminar\'s token for students via bluetooth</string>
     <string name="bluetooth_teacher_text_to_present_device">Attendees should connect with: </string>

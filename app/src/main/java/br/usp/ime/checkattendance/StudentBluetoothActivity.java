@@ -30,7 +30,6 @@ public class StudentBluetoothActivity extends AppCompatActivity {
 
     private BluetoothAdapter adapter;
     private BluetoothDevice device;
-    private BluetoothSocket socket;
     private ConnectedThread thread;
     private Handler handler;
 
@@ -69,11 +68,8 @@ public class StudentBluetoothActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            this.thread.cancel();
-            setResult(NOT_REFRESH);
-            finish();
-        }
+        if (item.getItemId() == android.R.id.home)
+            this.closeActivity(NOT_REFRESH);
 
         return super.onOptionsItemSelected(item);
     }
@@ -97,32 +93,38 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         startActivityForResult(intent, 0);
     }
 
+    private void closeActivity(int refresh) {
+        if(refresh == REFRESH)
+            setResult(REFRESH);
+        else
+            setResult(NOT_REFRESH);
+
+        if (this.thread != null) this.thread.cancel();
+        finish();
+    }
+
+    private void showMessage(String message, int duration) {
+        Toast.makeText(StudentBluetoothActivity.this, message,duration).show();
+    }
+
     private void confirmPresenceInSeminar(String seminarId) {
         this.networkController.confirmAttendance(this.nusp, seminarId, this, new ServerCallback() {
             @Override
             public void onSuccess(String response) {
                 if (response.contains("\"success\":true")) {
-                    Toast.makeText(StudentBluetoothActivity.this,
-                            getString(R.string.confirm_attendance),
-                            Toast.LENGTH_LONG).show();
-                    setResult(REFRESH);
-                    finish();
+                    showMessage(getString(R.string.confirm_attendance), Toast.LENGTH_LONG);
+                    closeActivity(REFRESH);
                 } else {
-                    Toast.makeText(StudentBluetoothActivity.this,
-                            getString(R.string.problem_attendance_confirmation),
-                            Toast.LENGTH_LONG).show();
-                    setResult(NOT_REFRESH);
-                    finish();
+                    showMessage(getString(R.string.problem_attendance_confirmation),
+                            Toast.LENGTH_LONG);
+                    closeActivity(NOT_REFRESH);
                 }
             }
 
             @Override
             public void onError() {
-                Toast.makeText(StudentBluetoothActivity.this,
-                        getString(R.string.network_issue),
-                        Toast.LENGTH_LONG).show();
-                setResult(NOT_REFRESH);
-                finish();
+                showMessage(getString(R.string.network_issue), Toast.LENGTH_LONG);
+                closeActivity(NOT_REFRESH);
             }
         });
     }
@@ -145,11 +147,8 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                     if (seminarIdRead.equals(seminarId))
                         confirmPresenceInSeminar(seminarId);
                     else {
-                        Toast.makeText(StudentBluetoothActivity.this,
-                                getString(R.string.different_seminar),
-                                Toast.LENGTH_LONG).show();
-                        setResult(NOT_REFRESH);
-                        finish();
+                        showMessage(getString(R.string.different_seminar), Toast.LENGTH_LONG);
+                        closeActivity(NOT_REFRESH);
                     }
                 }
             }
@@ -160,13 +159,11 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         this.setupHandler();
         this.getBluetoothAdapter();
         this.getDevice();
-        this.getSocket();
-        this.connectSocket();
         this.startThread();
     }
 
     private void startThread() {
-        this.thread = new ConnectedThread(this.socket, this.handler);
+        this.thread = new ConnectedThread(this.handler);
         this.thread.start();
     }
 
@@ -174,11 +171,8 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         this.adapter = BluetoothAdapter.getDefaultAdapter();
 
         if (this.adapter == null) {
-            Toast.makeText(StudentBluetoothActivity.this,
-                    getString(R.string.bluetooth_not_supported),
-                    Toast.LENGTH_SHORT).show();
-            setResult(NOT_REFRESH);
-            finish();
+            showMessage(getString(R.string.bluetooth_not_supported), Toast.LENGTH_SHORT);
+            closeActivity(NOT_REFRESH);
         }
     }
 
@@ -186,48 +180,48 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         this.device = this.adapter.getRemoteDevice(this.mac_address_to_connect);
     }
 
-    private void getSocket() {
-        try {
-            this.socket = this.device.createRfcommSocketToServiceRecord(this.appUUID);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(StudentBluetoothActivity.this,
-                    getString(R.string.cannot_get_socket),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void closeSocket() {
-        try {
-            this.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            this.socket = null;
-        }
-    }
-
-    private void connectSocket() {
-        try {
-            this.socket.connect();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(StudentBluetoothActivity.this,
-                    getString(R.string.cannot_connect_socket),
-                    Toast.LENGTH_SHORT).show();
-            this.closeSocket();
-        }
-    }
-
     public class ConnectedThread extends Thread {
         private InputStream mmInStream;
         private Handler handler;
         private BluetoothSocket socket;
 
-        public ConnectedThread(BluetoothSocket socket, Handler handler) {
+        public ConnectedThread(Handler handler) {
             this.handler = handler;
-            this.socket = socket;
+            this.getSocket();
+            this.connectSocket();
             this.setInputStream();
+        }
+
+        private void getSocket() {
+            try {
+                this.socket = device.createRfcommSocketToServiceRecord(appUUID);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(TAG, getString(R.string.cannot_get_socket));
+                showMessage(getString(R.string.cannot_get_socket), Toast.LENGTH_SHORT);
+            }
+        }
+
+        public void cancel() {
+            try {
+                this.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(TAG, getString(R.string.cannot_close_socket));
+            } finally {
+                this.socket = null;
+            }
+        }
+
+        private void connectSocket() {
+            try {
+                this.socket.connect();
+            } catch (IOException e) {
+                e.printStackTrace();
+                showMessage(getString(R.string.cannot_connect_socket), Toast.LENGTH_SHORT);
+                Log.d(TAG, getString(R.string.cannot_connect_socket));
+                this.cancel();
+            }
         }
 
         private void setInputStream() {
@@ -237,6 +231,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                 tmpIn = this.socket.getInputStream();
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.d(TAG, getString(R.string.cannot_get_inputstream_socket));
             }
 
             this.mmInStream = tmpIn;
@@ -250,19 +245,11 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                 try {
                     bytes = mmInStream.read(buffer);
                     String readMessage = new String(buffer, 0, bytes);
+                    Log.d(TAG, getString(R.string.reading) + readMessage);
                     this.handler.obtainMessage(MSG_TO_READ, bytes, -1, readMessage).sendToTarget();
                 } catch (IOException e) {
                     break;
                 }
-            }
-        }
-
-        public void cancel() {
-            try {
-                this.socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d(TAG, getString(R.string.cannot_close_socket));
             }
         }
     }
