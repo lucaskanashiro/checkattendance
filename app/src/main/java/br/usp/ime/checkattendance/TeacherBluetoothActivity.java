@@ -1,5 +1,6 @@
 package br.usp.ime.checkattendance;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -41,7 +42,6 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
         this.getSentData();
         this.checkBluetoothState();
         this.initializeUIComponents();
-        this.runThread();
     }
 
     private void setupActionBar() {
@@ -81,7 +81,9 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
     private void checkBluetoothState() {
         this.adapter=BluetoothAdapter.getDefaultAdapter();
 
-        if(this.adapter == null) {
+        if (this.adapter != null && this.adapter.isEnabled())
+            this.startThread();
+        else if(this.adapter == null) {
             Toast.makeText(TeacherBluetoothActivity.this,
                     getString(R.string.bluetooth_not_supported),
                     Toast.LENGTH_SHORT).show();
@@ -92,7 +94,13 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
         }
     }
 
-    private void runThread() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK)
+            this.startThread();
+    }
+
+    private void startThread() {
         this.thread = new AcceptThread();
         this.thread.start();
     }
