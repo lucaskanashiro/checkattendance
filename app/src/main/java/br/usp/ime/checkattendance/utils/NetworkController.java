@@ -22,9 +22,10 @@ import br.usp.ime.checkattendance.RegisterActivity;
 
 public class NetworkController {
 
-    public void register(String url, String name, String nusp, String passwd, Context context,
+    public void register(String type, String name, String nusp, String passwd, Context context,
                          ServerCallback callback) {
 
+        String url = "http://207.38.82.139:8001/" + type + "/add";
         String params = "nusp=" + nusp + "&pass=" + passwd + "&name=" + name;
         this.post(url, params, context, callback);
     }

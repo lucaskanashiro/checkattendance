@@ -14,7 +14,9 @@
     <string name="update_seminar_title">Update Seminar</string>
     <string name="register_seminar_title">Register Seminar</string>
     <string name="update_profile_title">Update Profile</string>
+    <string name="register_profile">Register</string>
 
+    <string name="profile_registered">You registered a new </string>
     <string name="profile_updated">Profile updated!</string>
     <string name="profile_not_updated">Your profile was not updated. Try again later</string>
     <string name="abscence_passwd">You must provide a password to update your profile</string>

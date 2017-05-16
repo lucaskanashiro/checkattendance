@@ -24,7 +24,6 @@ import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class RegisterActivity extends AppCompatActivity {
-
     private EditText mNameEditText;
     private EditText mNuspEditText;
     private EditText mPasswdEditText;
@@ -43,7 +42,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         setupActionBar();
         getSentData();
-
         this.networkController = new NetworkController();
         initializeUIComponents();
         initializeCallback();
@@ -53,14 +51,14 @@ public class RegisterActivity extends AppCompatActivity {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("Register");
+            actionBar.setTitle(getString(R.string.register_profile));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.type = intent.getStringExtra("type");
+        this.type = intent.getStringExtra(getString(R.string.type));
     }
 
     private void initializeUIComponents() {
@@ -69,19 +67,21 @@ public class RegisterActivity extends AppCompatActivity {
         this.mPasswdEditText = (EditText) findViewById(R.id.et_passwd_register);
     }
 
+    private void showMessage(String message, int duration) {
+        Toast.makeText(RegisterActivity.this, message, duration).show();
+    }
+
     private void initializeCallback() {
         this.serverCallback = new ServerCallback() {
             @Override
             public void onSuccess(String response) {
-                String message = "You are registered as new " + type;
-                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
+                showMessage(getString(R.string.profile_registered) + " " + type, Toast.LENGTH_LONG);
                 finish();
             }
 
             @Override
             public void onError() {
-                String message = "We had some problem. Please, try again later";
-                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
+                showMessage(getString(R.string.network_issue), Toast.LENGTH_LONG);
                 finish();
             }
         };
@@ -104,22 +104,19 @@ public class RegisterActivity extends AppCompatActivity {
     public void signUp(View v) {
         getInputs();
 
-        if (this.type.equals("student")) {
+        if (this.type.equals(getString(R.string.student)))
             this.registerStudent();
-        } else {
+        else
             this.registerTeacher();
-        }
     }
 
     private void registerStudent() {
-        String url = "http://207.38.82.139:8001/student/add";
-        this.networkController.register(url, this.name, this.nusp, this.passwd, this,
-                this.serverCallback);
+        this.networkController.register(getString(R.string.student), this.name, this.nusp,
+                this.passwd, this, this.serverCallback);
     }
 
     private void registerTeacher() {
-        String url = "http://207.38.82.139:8001/teacher/add";
-        this.networkController.register(url, this.name, this.nusp, this.passwd, this,
-                this.serverCallback);
+        this.networkController.register(getString(R.string.teacher), this.name, this.nusp,
+                this.passwd, this, this.serverCallback);
     }
 }
