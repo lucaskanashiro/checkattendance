@@ -6,6 +6,8 @@
     <string name="seminar_name">name</string>
     <string name="seminar_id_received">Seminar ID received: </string>
     <string name="seminar_auth">Seminar authentication</string>
+    <string name="seminar_id_readed_log">SEMINAR ID READED: </string>
+    <string name="seminar_id_received_log">SEMINAR ID RECEIVED: </string>
 
     <string name="nusp">nusp</string>
 

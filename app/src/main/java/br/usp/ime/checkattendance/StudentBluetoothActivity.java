@@ -25,7 +25,7 @@ import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class StudentBluetoothActivity extends AppCompatActivity {
-
+    private final String TAG = "StudentBluetooth";
     private static final UUID appUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B1527");
 
     private BluetoothAdapter adapter;
@@ -33,9 +33,8 @@ public class StudentBluetoothActivity extends AppCompatActivity {
     private BluetoothSocket socket;
     private ConnectedThread thread;
     private Handler handler;
-    private final int MSG_TO_READ = 0;
-    private final int MSG_TOAST = 8;
 
+    private final int MSG_TO_READ = 0;
     private final int REFRESH = 0;
     private final int NOT_REFRESH = 1;
 
@@ -63,7 +62,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("Seminar authentication");
+            actionBar.setTitle(getString(R.string.seminar_auth));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -81,9 +80,9 @@ public class StudentBluetoothActivity extends AppCompatActivity {
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.seminarId = intent.getStringExtra("id");
-        this.seminarName = intent.getStringExtra("name");
-        this.nusp = intent.getStringExtra("nusp");
+        this.seminarId = intent.getStringExtra(getString(R.string.seminar_id));
+        this.seminarName = intent.getStringExtra(getString(R.string.seminar_name));
+        this.nusp = intent.getStringExtra(getString(R.string.nusp));
     }
 
     private void initializeUIComponents() {
@@ -93,8 +92,8 @@ public class StudentBluetoothActivity extends AppCompatActivity {
 
     public void scanDevices(View v) {
         Intent intent = new Intent(this, BluetoothDeviceListActivity.class);
-        intent.putExtra("id", this.seminarId);
-        intent.putExtra("name", this.seminarName);
+        intent.putExtra(getString(R.string.seminar_id), this.seminarId);
+        intent.putExtra(getString(R.string.seminar_name), this.seminarName);
         startActivityForResult(intent, 0);
     }
 
@@ -103,13 +102,15 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             @Override
             public void onSuccess(String response) {
                 if (response.contains("\"success\":true")) {
-                    String message = "Your attendance for this seminar was confirmed";
-                    Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(StudentBluetoothActivity.this,
+                            getString(R.string.confirm_attendance),
+                            Toast.LENGTH_LONG).show();
                     setResult(REFRESH);
                     finish();
                 } else {
-                    String message = "We had some problem during your attendance confirmation. Please, try again later";
-                    Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(StudentBluetoothActivity.this,
+                            getString(R.string.problem_attendance_confirmation),
+                            Toast.LENGTH_LONG).show();
                     setResult(NOT_REFRESH);
                     finish();
                 }
@@ -117,8 +118,9 @@ public class StudentBluetoothActivity extends AppCompatActivity {
 
             @Override
             public void onError() {
-                String message = "We had some network problem. Please, try again later";
-                Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentBluetoothActivity.this,
+                        getString(R.string.network_issue),
+                        Toast.LENGTH_LONG).show();
                 setResult(NOT_REFRESH);
                 finish();
             }
@@ -138,32 +140,30 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             public void handleMessage(Message msg) {
                 if (msg.what == MSG_TO_READ) {
                     seminarIdRead = (String) msg.obj;
-                    Log.d("SEMINAR ID READED", seminarIdRead);
-                    Log.d("SEMINAR ID RECEIVED", seminarId);
+                    Log.d(TAG, getString(R.string.seminar_id_readed_log) + seminarIdRead);
+                    Log.d(TAG, getString(R.string.seminar_id_received_log) + seminarId);
                     if (seminarIdRead.equals(seminarId))
                         confirmPresenceInSeminar(seminarId);
                     else {
-                        String m = "The scanned seminar isn't the same that you selected. Try again";
-                        Toast.makeText(StudentBluetoothActivity.this, m, Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentBluetoothActivity.this,
+                                getString(R.string.different_seminar),
+                                Toast.LENGTH_LONG).show();
                         setResult(NOT_REFRESH);
                         finish();
                     }
-                }
-                if (msg.what == MSG_TOAST) {
-                    String message = (String) msg.obj;
-                    Toast.makeText(StudentBluetoothActivity.this, message, Toast.LENGTH_SHORT).show();
                 }
             }
         };
     }
 
     private void startThread() {
-
         this.setupHandler();
         this.adapter = BluetoothAdapter.getDefaultAdapter();
 
         if (this.adapter == null) {
-            Toast.makeText(this, "Bluetooth not available", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StudentBluetoothActivity.this,
+                    getString(R.string.bluetooth_not_supported),
+                    Toast.LENGTH_SHORT).show();
             setResult(NOT_REFRESH);
             finish();
         }
@@ -174,14 +174,18 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             this.socket = this.device.createRfcommSocketToServiceRecord(this.appUUID);
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Socket creation failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StudentBluetoothActivity.this,
+                    getString(R.string.cannot_get_socket),
+                    Toast.LENGTH_SHORT).show();
         }
 
         try {
             this.socket.connect();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Cannot connect via socket", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StudentBluetoothActivity.this,
+                    getString(R.string.cannot_connect_socket),
+                    Toast.LENGTH_SHORT).show();
             try {
                 this.socket.close();
             } catch (IOException e1) {
@@ -234,26 +238,12 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             }
         }
 
-        public void write(String input) {
-            byte[] msgBuffer = input.getBytes();
-
-            try {
-                mmOutStream.write(msgBuffer);
-            } catch (IOException e) {
-                Message msg = this.handler.obtainMessage(MSG_TOAST);
-                Bundle bundle = new Bundle();
-                bundle.putString("toast", "Unable to connect device");
-                msg.setData(bundle);
-                this.handler.sendMessage(msg);
-            }
-        }
-
         public void cancel() {
             try {
                 this.socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e("SOCKET", "Could not close the connect socket", e);
+                Log.d(TAG, getString(R.string.cannot_close_socket));
             }
         }
     }
