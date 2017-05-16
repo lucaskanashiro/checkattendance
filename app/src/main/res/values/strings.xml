@@ -21,6 +21,8 @@
     <string name="profile_not_updated">Your profile was not updated. Try again later</string>
     <string name="abscence_passwd">You must provide a password to update your profile</string>
 
+    <string name="successfull_login">You are logged in as </string>
+    <string name="login_error">Wrong credentials. Please, try agai</string>
     <string name="profile_name">name</string>
 
     <string name="seminar_registered_successfully">The seminar was registered successfully</string>

@@ -19,7 +19,6 @@ import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class LoginActivity extends AppCompatActivity {
-
     private EditText mNuspEditText;
     private EditText mPasswdEditText;
 
@@ -44,48 +43,59 @@ public class LoginActivity extends AppCompatActivity {
         this.mPasswdEditText = (EditText) findViewById(R.id.et_passwd);
     }
 
+    private void showMessage(String message, int duration) {
+        Toast.makeText(LoginActivity.this, message, duration).show();
+    }
+
+    private String getType() {
+        return (!tryLoginAsTeacher) ? getString(R.string.student) : getString(R.string.teacher);
+    }
+
+    private void callNextActivity(String type) {
+        Intent intent;
+
+        if (type.equals(getString(R.string.student)))
+            intent = new Intent(LoginActivity.this, StudentHomeActivity.class);
+        else
+            intent = new Intent(LoginActivity.this, TeacherHomeActivity.class);
+
+        intent.putExtra(getString(R.string.nusp), nusp);
+        startActivity(intent);
+    }
+
     private void initializeCallback() {
         this.serverCallback = new ServerCallback() {
             @Override
             public void onSuccess(String response) {
                 if (response.contains("\"success\":true")) {
-                    String type = (!tryLoginAsTeacher) ? "student" : "teacher";
-                    String message = "You are logged in as " + type;
-                    Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
-                    Intent intent;
+                    String type = getType();
 
-                    if (type.equals("student")) {
-                        intent = new Intent(LoginActivity.this, StudentHomeActivity.class);
-                    } else {
-                        intent = new Intent(LoginActivity.this, TeacherHomeActivity.class);
-                    }
+                    showMessage(getString(R.string.successfull_login) + " " + type,
+                            Toast.LENGTH_LONG);
 
-                    intent.putExtra("nusp", nusp);
-                    startActivity(intent);
-
-                    mPasswdEditText.setText("");
-                    mNuspEditText.setText("");
-
+                    callNextActivity(type);
+                    cleanFields();
                 } else {
                     if (!tryLoginAsTeacher) {
                         tryLoginAsTeacher = true;
                         loginTeacher();
                     } else {
-                        String message = "Wrong credentials. Please, try again";
-                        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
-
-                        mNuspEditText.setText("");
-                        mPasswdEditText.setText("");
+                        showMessage(getString(R.string.login_error), Toast.LENGTH_LONG);
+                        cleanFields();
                     }
                 }
             }
 
             @Override
             public void onError() {
-                String message = "We had some problem. Please, try again later";
-                Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                showMessage(getString(R.string.network_issue), Toast.LENGTH_LONG);
             }
         };
+    }
+
+    private void cleanFields() {
+        this.mNuspEditText.setText("");
+        this.mPasswdEditText.setText("");
     }
 
     private void getInputs() {
@@ -95,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void register(View v) {
         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-        intent.putExtra("type", "student");
+        intent.putExtra(getString(R.string.type), getString(R.string.student));
         startActivity(intent);
     }
 
@@ -106,12 +116,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginStudent() {
-        String url = "http://207.38.82.139:8001/login/student";
-        this.networkController.login(url, this.nusp,this.passwd, this, this.serverCallback);
+        this.networkController.login(getString(R.string.student), this.nusp,this.passwd, this,
+                this.serverCallback);
     }
 
     private void loginTeacher() {
-        String url = "http://207.38.82.139:8001/login/teacher";
-        this.networkController.login(url, this.nusp,this.passwd, this, this.serverCallback);
+        this.networkController.login(getString(R.string.teacher), this.nusp,this.passwd, this,
+                this.serverCallback);
     }
 }

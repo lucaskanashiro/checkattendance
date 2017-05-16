@@ -30,9 +30,9 @@ public class NetworkController {
         this.post(url, params, context, callback);
     }
 
-    public void login(String url, String nusp, String passwd, Context context,
+    public void login(String type, String nusp, String passwd, Context context,
                       ServerCallback callback) {
-
+        String url = "http://207.38.82.139:8001/login/" + type;
         String params = "nusp=" + nusp + "&pass=" + passwd;
         this.post(url, params, context, callback);
     }
