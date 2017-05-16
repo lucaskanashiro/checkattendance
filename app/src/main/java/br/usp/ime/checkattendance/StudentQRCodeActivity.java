@@ -24,11 +24,9 @@ import static android.R.attr.onClick;
 import static android.R.attr.type;
 
 public class StudentQRCodeActivity extends AppCompatActivity {
-
     private NetworkController networkController;
     private String studentNusp;
     private String selectedSeminarId;
-    private String selectedSeminarName;
 
     private final int REFRESH = 0;
     private final int NOT_REFRESH = 0;
@@ -46,14 +44,13 @@ public class StudentQRCodeActivity extends AppCompatActivity {
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.selectedSeminarId = intent.getStringExtra("id");
-        this.studentNusp = intent.getStringExtra("nusp");
-        this.selectedSeminarName = intent.getStringExtra("name");
+        this.selectedSeminarId = intent.getStringExtra(getString(R.string.seminar_id));
+        this.studentNusp = intent.getStringExtra(getString(R.string.nusp));
     }
 
     private void initScan() {
         IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setPrompt("Scan the seminar QR code");
+        integrator.setPrompt(getString(R.string.qr_code_prompt_camera));
         integrator.setOrientationLocked(false);
         integrator.initiateScan();
     }
@@ -62,19 +59,49 @@ public class StudentQRCodeActivity extends AppCompatActivity {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("Scan QR code");
+            actionBar.setTitle(getString(R.string.qr_code_title));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            finish();
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showMessage(String message, int duration) {
+        Toast.makeText(StudentQRCodeActivity.this, message, duration).show();
+    }
+
+    private void closeActivity(int refresh) {
+        if (refresh == REFRESH)
+            setResult(REFRESH);
+        else
+            setResult(NOT_REFRESH);
+
+        finish();
+    }
+
+    private void qrCodeScanCancelled() {
+        this.showMessage(getString(R.string.cancel_qr_code_scan), Toast.LENGTH_LONG);
+        this.closeActivity(NOT_REFRESH);
+    }
+
+    private void formatNotSupported() {
+        this.showMessage(getString(R.string.qr_code_format_not_supported), Toast.LENGTH_LONG);
+        this.closeActivity(NOT_REFRESH);
+    }
+
+    private void scannedSeminarIsDifferent() {
+        this.showMessage(getString(R.string.different_seminar), Toast.LENGTH_LONG);
+        this.closeActivity(NOT_REFRESH);
+    }
+
+    private boolean isQrCodeFormat(String format) {
+        return format.equals(getString(R.string.qr_code_format));
     }
 
     @Override
@@ -82,30 +109,19 @@ public class StudentQRCodeActivity extends AppCompatActivity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
         if (result != null) {
-            if (result.getContents() == null) {
-                Toast.makeText(this, "Cancelled QR code scan", Toast.LENGTH_LONG).show();
-                setResult(NOT_REFRESH);
-                finish();
-            } else {
-                if (result.getFormatName().equals("QR_CODE")) {
+            if (result.getContents() == null)
+                this.qrCodeScanCancelled();
+            else {
+                if (this.isQrCodeFormat(result.getFormatName())) {
                     String scannedSeminarId = result.getContents();
 
-                    if (this.selectedSeminarId.equals(scannedSeminarId)) {
+                    if (this.selectedSeminarId.equals(scannedSeminarId))
                         this.confirmPresenceInSeminar(scannedSeminarId);
-                    } else {
-                        String msg = "The scanned seminar isn't the same that you selected. Try again";
-                        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                        setResult(NOT_REFRESH);
-                        finish();
-                    }
-                } else {
-                    Toast.makeText(this, "Format not supported. Try again.", Toast.LENGTH_LONG).show();
-                    setResult(NOT_REFRESH);
-                    finish();
-                }
+                    else
+                        this.scannedSeminarIsDifferent();
+                } else
+                    this.formatNotSupported();
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -116,24 +132,18 @@ public class StudentQRCodeActivity extends AppCompatActivity {
             @Override
             public void onSuccess(String response) {
                 if (response.contains("\"success\":true")) {
-                    String message = "Your attendance for this seminar was confirmed";
-                    Toast.makeText(StudentQRCodeActivity.this, message, Toast.LENGTH_LONG).show();
-                    setResult(REFRESH);
-                    finish();
+                    showMessage(getString(R.string.confirm_attendance), Toast.LENGTH_LONG);
+                    closeActivity(REFRESH);
                 } else {
-                    String message = "We had some problem during your attendance confirmation. Please, try again later";
-                    Toast.makeText(StudentQRCodeActivity.this, message, Toast.LENGTH_LONG).show();
-                    setResult(NOT_REFRESH);
-                    finish();
+                    showMessage(getString(R.string.problem_attendance_confirmation), Toast.LENGTH_LONG);
+                    closeActivity(NOT_REFRESH);
                 }
             }
 
             @Override
             public void onError() {
-                String message = "We had some network problem. Please, try again later";
-                Toast.makeText(StudentQRCodeActivity.this, message, Toast.LENGTH_LONG).show();
-                setResult(NOT_REFRESH);
-                finish();
+                showMessage(getString(R.string.network_issue), Toast.LENGTH_LONG);
+                closeActivity(NOT_REFRESH);
             }
         });
     }

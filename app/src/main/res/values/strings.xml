@@ -58,4 +58,10 @@
     <string name="bluetooth_teacher_accepting_connections">\n\nYou are accepting connections to send the seminar\'s token for students via bluetooth</string>
     <string name="bluetooth_teacher_text_to_present_device">Attendees should connect with: </string>
     <string name="bluetooth_not_supported">Device does not support Bluetooth</string>
+
+    <string name="qr_code_title">Scan QR code</string>
+    <string name="qr_code_prompt_camera">Scan the seminar QR code</string>
+    <string name="cancel_qr_code_scan">Cancelled QR code scan</string>
+    <string name="qr_code_format">QR_CODE</string>
+    <string name="qr_code_format_not_supported">Format not supported. Try again</string>
 </resources>
