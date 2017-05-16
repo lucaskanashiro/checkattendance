@@ -18,7 +18,6 @@ import br.usp.ime.checkattendance.utils.Parser;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class UpdateProfileActivity extends AppCompatActivity {
-
     private EditText mNameEditText;
     private EditText mNuspEditText;
     private EditText mPasswdEditText;
@@ -35,13 +34,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
 
-        ActionBar actionBar = this.getSupportActionBar();
-
-        if (actionBar != null) {
-            actionBar.setTitle("Update Profile");
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
+        this.setupActionBar();
         getSentData();
         initializeUIComponents();
 
@@ -50,26 +43,37 @@ public class UpdateProfileActivity extends AppCompatActivity {
         getCurrentData();
     }
 
+    private void setupActionBar() {
+        ActionBar actionBar = this.getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setTitle(getString(R.string.update_profile_title));
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            finish();
+
         return super.onOptionsItemSelected(item);
     }
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.type = intent.getStringExtra("type");
-        this.nusp_sent = intent.getStringExtra("nusp");
+        this.type = intent.getStringExtra(getString(R.string.type));
+        this.nusp_sent = intent.getStringExtra(getString(R.string.nusp));
     }
 
     private void initializeUIComponents() {
         this.mNameEditText = (EditText) findViewById(R.id.et_name_edit);
         this.mNuspEditText = (EditText) findViewById(R.id.et_nusp_edit);
         this.mPasswdEditText = (EditText) findViewById(R.id.et_passwd_edit);
+    }
+
+    private void showMessage(String message, int duration) {
+        Toast.makeText(UpdateProfileActivity.this, message, duration).show();
     }
 
     private void setupCallbacks() {
@@ -88,28 +92,25 @@ public class UpdateProfileActivity extends AppCompatActivity {
         this.serverCallbackUpdateData = new ServerCallback() {
             @Override
             public void onSuccess(String response) {
-                if (response.contains("\"success\":true")) {
-                    String message = "Profile updated!";
-                    Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
-                    UpdateProfileActivity.this.finish();
-                } else {
-                    String message = "Your profile was not updated. Try again later";
-                    Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
-                    UpdateProfileActivity.this.finish();
-                }
+                if (response.contains("\"success\":true"))
+                    showMessage(getString(R.string.profile_updated), Toast.LENGTH_LONG);
+                else
+                    showMessage(getString(R.string.profile_not_updated), Toast.LENGTH_LONG);
+
+                UpdateProfileActivity.this.finish();
+
             }
 
             @Override
             public void onError() {
-                String message = "Your profile was not updated. Try again later";
-                Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                showMessage(getString(R.string.profile_not_updated), Toast.LENGTH_LONG);
                 UpdateProfileActivity.this.finish();
             }
         };
     }
 
     private void getCurrentData() {
-        if (this.type.equals("student")) {
+        if (this.type.equals(getString(R.string.student))) {
             this.networkController.getStudentData(this.nusp_sent, this, this.serverCallbackGetData);
         } else {
             this.networkController.getTeacherData(this.nusp_sent, this, this.serverCallbackGetData);
@@ -118,7 +119,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
     private void setCurrentDataInForm(String response) {
         try {
-            this.current_name = Parser.parseData(response, "name");
+            this.current_name = Parser.parseData(response, getString(R.string.profile_name));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -134,19 +135,24 @@ public class UpdateProfileActivity extends AppCompatActivity {
         nusp = this.mNuspEditText.getText().toString();
         passwd = this.mPasswdEditText.getText().toString();
 
+        this.validateFields(name, nusp, passwd);
+    }
+
+    private void validateFields(String name, String nusp, String passwd) {
         if (name.matches("")) name = this.current_name;
         if (nusp.matches("")) nusp = this.nusp_sent;
-        if (passwd.matches("")) {
-            String message = "You must provide a password to update your profile";
-            Toast.makeText(UpdateProfileActivity.this, message, Toast.LENGTH_LONG).show();
-        } else {
-            if (this.type.equals("student")) {
-                this.networkController.updateStudentData(nusp, name, passwd, this,
-                        this.serverCallbackUpdateData);
-            } else {
-                this.networkController.updateTeacherData(nusp, name, passwd, this,
-                        this.serverCallbackUpdateData);
-            }
-        }
+        if (passwd.matches(""))
+            showMessage(getString(R.string.abscence_passwd), Toast.LENGTH_LONG);
+        else
+            this.doRequest(name, nusp, passwd);
+    }
+
+    private void doRequest(String name, String nusp, String passwd) {
+        if (this.type.equals(getString(R.string.student)))
+            this.networkController.updateStudentData(nusp, name, passwd, this,
+                    this.serverCallbackUpdateData);
+        else
+            this.networkController.updateTeacherData(nusp, name, passwd, this,
+                    this.serverCallbackUpdateData);
     }
 }

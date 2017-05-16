@@ -13,6 +13,13 @@
     <string name="list_attendees_title">List Attendees</string>
     <string name="update_seminar_title">Update Seminar</string>
     <string name="register_seminar_title">Register Seminar</string>
+    <string name="update_profile_title">Update Profile</string>
+
+    <string name="profile_updated">Profile updated!</string>
+    <string name="profile_not_updated">Your profile was not updated. Try again later</string>
+    <string name="abscence_passwd">You must provide a password to update your profile</string>
+
+    <string name="profile_name">name</string>
 
     <string name="seminar_registered_successfully">The seminar was registered successfully</string>
     <string name="seminar_updated">Seminar updated!</string>
