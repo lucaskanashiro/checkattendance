@@ -65,8 +65,7 @@ public class AttendedSeminarsFragment extends Fragment {
     }
 
     private void setupFragment() {
-        this.adapter = new SeminarAdapter(this.attendedSeminars,
-                getString(R.string.student), null);
+        this.adapter = new SeminarAdapter(this.attendedSeminars, null);
         this.linearLayoutManager = new LinearLayoutManager(getActivity());
         this.setupRecyclerView();
     }
@@ -118,8 +117,7 @@ public class AttendedSeminarsFragment extends Fragment {
     }
 
     private void setAdapterOnRecyclerView() {
-        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars,
-                getString(R.string.student), null);
+        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars, null);
         this.recyclerView.setAdapter(adapter);
     }
 }

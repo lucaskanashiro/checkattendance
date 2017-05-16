@@ -19,21 +19,16 @@ import br.usp.ime.checkattendance.utils.ClickListener;
  */
 
 public class SeminarAdapter extends RecyclerView.Adapter<SeminarAdapter.SeminarViewHolder> {
-
     private ArrayList<Seminar> seminars;
-    private String type;
     private ClickListener listener;
 
     public class SeminarViewHolder extends RecyclerView.ViewHolder {
-        private CardView mCardView;
         private TextView mTextView;
         private View itemView;
 
         public SeminarViewHolder(View view) {
             super(view);
             this.itemView = view;
-
-            this.mCardView = (CardView) this.itemView.findViewById(R.id.card_view);
             this.mTextView = (TextView) this.itemView.findViewById(R.id.tv_text);
         }
 
@@ -49,16 +44,13 @@ public class SeminarAdapter extends RecyclerView.Adapter<SeminarAdapter.SeminarV
         }
     }
 
-    public SeminarAdapter(ArrayList<Seminar> myDataset, String type, ClickListener listener) {
+    public SeminarAdapter(ArrayList<Seminar> myDataset, ClickListener listener) {
         this.seminars = myDataset;
-        this.type = type;
         this.listener = listener;
     }
 
     @Override
-    public SeminarAdapter.SeminarViewHolder onCreateViewHolder(ViewGroup parent,
-                                                     int viewType) {
-
+    public SeminarAdapter.SeminarViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_item, parent, false);
         return new SeminarViewHolder(v);
     }
