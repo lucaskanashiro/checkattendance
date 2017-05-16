@@ -2,6 +2,19 @@
     <string name="app_name">CheckAttendance</string>
     <string name="register"><u><b><i>Cadastre-se</i></b></u></string>
 
+    <string name="teacher">teacher</string>
+    <string name="student">student</string>
+    <string name="nusp">nusp</string>
+    <string name="type">type</string>
+    <string name="response">response</string>
+    <string name="allStudents">allStudents</string>
+    
+    <string name="list_attendees_title">List Attendees</string>
+    <string name="update_seminar_title">Update Seminar</string>
+
+    <string name="seminar_updated">Seminar updated!</string>
+    <string name="seminar_not_updated">Seminar was not updated. Try again later</string>
+
     <string name="seminar_id">id</string>
     <string name="seminar_name">name</string>
     <string name="seminar_id_received">Seminar ID received: </string>
@@ -9,7 +22,8 @@
     <string name="seminar_id_readed_log">SEMINAR ID READED: </string>
     <string name="seminar_id_received_log">SEMINAR ID RECEIVED: </string>
 
-    <string name="nusp">nusp</string>
+    <string name="cannot_fetch_seminars">Sorry, we cannot fetch seminars data</string>
+    <string name="cannot_fetch_students">Sorry, we cannot fetch students data</string>
 
     <string name="confirm_attendance">Your attendance for this seminar was confirmed</string>
     <string name="problem_attendance_confirmation">We had some problem during your attendance confirmation. Please, try again later</string>
