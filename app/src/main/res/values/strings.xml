@@ -11,9 +11,13 @@
     
     <string name="list_attendees_title">List Attendees</string>
     <string name="update_seminar_title">Update Seminar</string>
+    <string name="register_seminar_title">Register Seminar</string>
 
+    <string name="seminar_registered_successfully">The seminar was registered successfully</string>
     <string name="seminar_updated">Seminar updated!</string>
     <string name="seminar_not_updated">Seminar was not updated. Try again later</string>
+
+    <string name="abscense_seminar_name">You must provide the name of the seminar</string>
 
     <string name="seminar_id">id</string>
     <string name="seminar_name">name</string>

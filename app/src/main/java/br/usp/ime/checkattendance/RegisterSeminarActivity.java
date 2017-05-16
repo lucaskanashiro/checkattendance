@@ -14,7 +14,6 @@ import br.usp.ime.checkattendance.utils.NetworkController;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class RegisterSeminarActivity extends AppCompatActivity {
-
     private EditText mNameEditText;
     private String name;
     private NetworkController networkController;
@@ -42,22 +41,31 @@ public class RegisterSeminarActivity extends AppCompatActivity {
         this.name = this.mNameEditText.getText().toString();
     }
 
+    private void showMessage(String message, int duration) {
+        Toast.makeText(RegisterSeminarActivity.this, message, duration).show();
+    }
+
+    private void closeActivity(int refresh) {
+        if (refresh == REFRESH_PAGE)
+            setResult(REFRESH_PAGE);
+        else
+            setResult(NOT_REFRESH_PAGE);
+
+        finish();
+    }
+
     private void setupCallback() {
         this.serverCallback = new ServerCallback() {
             @Override
             public void onSuccess(String response) {
-                String message = "The seminar was registered successfully";
-                Toast.makeText(RegisterSeminarActivity.this, message, Toast.LENGTH_LONG).show();
-                setResult(REFRESH_PAGE);
-                finish();
+                showMessage(getString(R.string.seminar_registered_successfully), Toast.LENGTH_LONG);
+                closeActivity(REFRESH_PAGE);
             }
 
             @Override
             public void onError() {
-                String message = "We had some problem. Please, try again later";
-                Toast.makeText(RegisterSeminarActivity.this, message, Toast.LENGTH_LONG).show();
-                setResult(NOT_REFRESH_PAGE);
-                finish();
+                showMessage(getString(R.string.network_issue), Toast.LENGTH_LONG);
+                closeActivity(NOT_REFRESH_PAGE);
             }
         };
     }
@@ -66,17 +74,15 @@ public class RegisterSeminarActivity extends AppCompatActivity {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("Register Seminar");
+            actionBar.setTitle(getString(R.string.register_seminar_title));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            setResult(NOT_REFRESH_PAGE);
-            finish();
-        }
+        if (item.getItemId() == android.R.id.home)
+            closeActivity(NOT_REFRESH_PAGE);
 
         return super.onOptionsItemSelected(item);
     }
@@ -84,11 +90,9 @@ public class RegisterSeminarActivity extends AppCompatActivity {
     public void registerSeminar(View v) {
         this.getInput();
 
-        if (this.name.matches("")) {
-            String message = "You must provide the name of the seminar";
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        } else {
+        if (this.name.matches(""))
+            this.showMessage(getString(R.string.abscense_seminar_name), Toast.LENGTH_LONG);
+        else
             this.networkController.registerSeminar(this.name, this, this.serverCallback);
-        }
     }
 }
