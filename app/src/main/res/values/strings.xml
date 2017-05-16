@@ -15,6 +15,7 @@
     <string name="register_seminar_title">Register Seminar</string>
     <string name="update_profile_title">Update Profile</string>
     <string name="register_profile">Register</string>
+    <string name="bluetooth_title">Bluetooth Devices</string>
 
     <string name="profile_registered">You registered a new </string>
     <string name="profile_updated">Profile updated!</string>
@@ -62,6 +63,10 @@
     <string name="bluetooth_teacher_accepting_connections">\n\nYou are accepting connections to send the seminar\'s token for students via bluetooth</string>
     <string name="bluetooth_teacher_text_to_present_device">Attendees should connect with: </string>
     <string name="bluetooth_not_supported">Device does not support Bluetooth</string>
+    <string name="bluetooth_no_paired_devices">None paired devices</string>
+    <string name="bluetooth_scanning">Scanning</string>
+    <string name="bluetooth_select_device">Select a device</string>
+    <string name="bluetooth_no_device">No devices found</string>
 
     <string name="qr_code_title">Scan QR code</string>
     <string name="qr_code_prompt_camera">Scan the seminar QR code</string>
