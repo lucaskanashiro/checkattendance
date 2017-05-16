@@ -18,7 +18,6 @@ import br.usp.ime.checkattendance.utils.ClickListener;
  */
 
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentViewHolder> {
-
     private ArrayList<Student> students;
 
     public class StudentViewHolder extends RecyclerView.ViewHolder {
@@ -42,10 +41,9 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     }
 
     @Override
-    public StudentAdapter.StudentViewHolder onCreateViewHolder(ViewGroup parent,
-                                                               int viewType) {
-
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_item_students, parent, false);
+    public StudentAdapter.StudentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_item_students,
+                parent, false);
         return new StudentViewHolder(v);
     }
 
