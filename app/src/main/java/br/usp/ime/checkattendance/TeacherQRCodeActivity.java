@@ -18,7 +18,6 @@ import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
 
 public class TeacherQRCodeActivity extends AppCompatActivity {
-
     private String id;
     private String name;
     private TextView seminarNameTextView;
@@ -38,8 +37,8 @@ public class TeacherQRCodeActivity extends AppCompatActivity {
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.id = intent.getStringExtra("id");
-        this.name = intent.getStringExtra("name");
+        this.id = intent.getStringExtra(getString(R.string.seminar_id));
+        this.name = intent.getStringExtra(getString(R.string.seminar_name));
     }
 
     private void initializeUIComponents() {
@@ -52,7 +51,7 @@ public class TeacherQRCodeActivity extends AppCompatActivity {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("Seminar Authentication");
+            actionBar.setTitle(getString(R.string.seminar_auth));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -62,7 +61,7 @@ public class TeacherQRCodeActivity extends AppCompatActivity {
         this.qrCodeImageView.setImageBitmap(bitmap);
     }
 
-    private Bitmap encodeAsBitmap(String content) {
+    private BitMatrix getResult(String content) {
         BitMatrix result = null;
         try {
             result = new MultiFormatWriter().encode(content,
@@ -72,17 +71,30 @@ public class TeacherQRCodeActivity extends AppCompatActivity {
         } catch (WriterException e) {
             e.printStackTrace();
         }
-        int w = result.getWidth();
-        int h = result.getHeight();
-        int[] pixels = new int[w * h];
-        for (int y = 0; y < h; y++) {
-            int offset = y * w;
-            for (int x = 0; x < w; x++) {
+        return result;
+    }
+
+    private int[] getPixels(BitMatrix result, int width, int height) {
+        int[] pixels = new int[width * height];
+
+        for (int y = 0; y < height; y++) {
+            int offset = y * width;
+            for (int x = 0; x < width; x++) {
                 pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
             }
         }
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        bitmap.setPixels(pixels, 0, this.WIDTH, 0, 0, w, h);
+        return pixels;
+    }
+
+    private Bitmap encodeAsBitmap(String content) {
+        BitMatrix result = getResult(content);
+        int width = result.getWidth();
+        int heigth = result.getHeight();
+
+        int[] pixels = getPixels(result, width, heigth);
+
+        Bitmap bitmap = Bitmap.createBitmap(width, heigth, Bitmap.Config.ARGB_8888);
+        bitmap.setPixels(pixels, 0, this.WIDTH, 0, 0, width, heigth);
         return bitmap;
     }
 
