@@ -8,6 +8,7 @@
     <string name="type">type</string>
     <string name="response">response</string>
     <string name="allStudents">allStudents</string>
+    <string name="allSeminars">allSeminars</string>
     
     <string name="list_attendees_title">List Attendees</string>
     <string name="update_seminar_title">Update Seminar</string>
@@ -26,6 +27,7 @@
     <string name="seminar_id_readed_log">SEMINAR ID READED: </string>
     <string name="seminar_id_received_log">SEMINAR ID RECEIVED: </string>
 
+    <string name="cannot_fetch_attended_seminar">Sorry, we cannot fetch your attended seminars</string>
     <string name="cannot_fetch_seminars">Sorry, we cannot fetch seminars data</string>
     <string name="cannot_fetch_students">Sorry, we cannot fetch students data</string>
 

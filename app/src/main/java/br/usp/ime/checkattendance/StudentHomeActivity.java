@@ -35,7 +35,6 @@ import br.usp.ime.checkattendance.utils.RequestQueueSingleton;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class StudentHomeActivity extends AppCompatActivity implements ClickListener {
-
     private String nusp;
     private String allSeminars;
     private String attendedSeminarsId;
@@ -58,10 +57,16 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
         setContentView(R.layout.activity_student_home);
 
         Intent intent = getIntent();
-        this.nusp = intent.getStringExtra("nusp");
+        this.nusp = intent.getStringExtra(getString(R.string.nusp));
 
         this.networkController = new NetworkController();
+        this.getSeminarsData();
 
+        this.setupDialogView();
+        this.createDialog();
+    }
+
+    private void getSeminarsData() {
         this.networkController.getAttendedSeminars(this.nusp, this, new ServerCallback() {
             @Override
             public void onSuccess(String response) {
@@ -71,37 +76,35 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                     e.printStackTrace();
                 }
                 networkController.getAllSeminars(StudentHomeActivity.this, new ServerCallback() {
-                            @Override
-                            public void onSuccess(String response) {
-                                allSeminars = response;
-                                setupViewPager();
-                                setupTabLayout();
-                            }
+                    @Override
+                    public void onSuccess(String response) {
+                        allSeminars = response;
+                        setupViewPager();
+                        setupTabLayout();
+                    }
 
-                            @Override
-                            public void onError() {
-                                String message = "Sorry, we cannot fetch seminars data";
-                                Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
-                            }
-                        }
-                );
+                    @Override
+                    public void onError() {
+                        showMessage(getString(R.string.cannot_fetch_seminars), Toast.LENGTH_LONG);
+                    }
+                });
             }
 
             @Override
             public void onError() {
-                String message = "Sorry, we cannot fetch seminars data";
-                Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
+                showMessage(getString(R.string.cannot_fetch_seminars), Toast.LENGTH_LONG);
             }
         });
+    }
 
-        this.setupDialogView();
-        this.createDialog();
+    private void showMessage(String message, int duration) {
+        Toast.makeText(StudentHomeActivity.this, message, duration).show();
     }
 
     private void setupViewPager() {
         this.viewPager = (ViewPager) findViewById(R.id.viewpager);
-        this.pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
-                StudentHomeActivity.this, this.allSeminars, this.attendedSeminarsId);
+        this.pagerAdapter = new PagerAdapter(getSupportFragmentManager(), this.allSeminars,
+                this.attendedSeminarsId);
         this.viewPager.setAdapter(pagerAdapter);
     }
 
@@ -143,41 +146,47 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
         if (id == R.id.student_edit_profile) {
             Intent intent = new Intent(StudentHomeActivity.this, UpdateProfileActivity.class);
-            intent.putExtra("nusp", this.nusp);
-            intent.putExtra("type", "student");
+            intent.putExtra(getString(R.string.nusp), this.nusp);
+            intent.putExtra(getString(R.string.type), getString(R.string.student));
             startActivity(intent);
-        } else if (id == R.id.student_logout) {
+        } else if (id == R.id.student_logout)
             finish();
-        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void qrCodeClickListener(final String seminarId, final String seminarName) {
+        this.qrCodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StudentHomeActivity.this, StudentQRCodeActivity.class);
+                intent.putExtra(getString(R.string.seminar_id), seminarId);
+                intent.putExtra(getString(R.string.seminar_name), seminarName);
+                intent.putExtra(getString(R.string.nusp), nusp);
+                startActivityForResult(intent, 0);
+            }
+        });
+    }
+
+    private void bluetoothClickListener(final String seminarId, final String seminarName) {
+        this.bluetoothButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StudentHomeActivity.this, StudentBluetoothActivity.class);
+                intent.putExtra(getString(R.string.seminar_id), seminarId);
+                intent.putExtra(getString(R.string.seminar_name), seminarName);
+                intent.putExtra(getString(R.string.nusp), nusp);
+                startActivityForResult(intent, 0);
+            }
+        });
     }
 
     @Override
     public void onSeminarClick(final Seminar seminar) {
         this.alertDialog.setTitle(seminar.getName());
 
-        this.qrCodeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(StudentHomeActivity.this, StudentQRCodeActivity.class);
-                intent.putExtra("id", seminar.getId());
-                intent.putExtra("name", seminar.getName());
-                intent.putExtra("nusp", nusp);
-                startActivityForResult(intent, 0);
-            }
-        });
-
-        this.bluetoothButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(StudentHomeActivity.this, StudentBluetoothActivity.class);
-                intent.putExtra("id", seminar.getId());
-                intent.putExtra("name", seminar.getName());
-                intent.putExtra("nusp", nusp);
-                startActivityForResult(intent, 0);
-            }
-        });
+        this.qrCodeClickListener(seminar.getId(), seminar.getName());
+        this.bluetoothClickListener(seminar.getId(), seminar.getName());
 
         this.alertDialog.setView(this.dialogView);
         this.alertDialog.show();
@@ -202,10 +211,8 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
                         e.printStackTrace();
                     }
                     pagerAdapter.getAttendedSeminarsFragment().setData(response);
-                } else {
-                    String message = "We had some problems to fetch your attended seminar, sorry";
-                    Toast.makeText(StudentHomeActivity.this, message, Toast.LENGTH_LONG).show();
-                }
+                } else
+                    showMessage(getString(R.string.cannot_fetch_attended_seminar), Toast.LENGTH_LONG);
             }
 
             @Override
@@ -215,16 +222,13 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
     public class PagerAdapter extends FragmentPagerAdapter {
         private String tabTitles[] = new String[] { "Attended Seminars", "All Seminars"};
-        private Context context;
         private String seminars;
         private String attendedSeminarsId;
         private SeminarsFragment seminarsFragment;
         private AttendedSeminarsFragment attendedSeminarsFragment;
 
-        public PagerAdapter(FragmentManager fm, Context context, String seminars,
-                            String attendedSeminarsId) {
+        public PagerAdapter(FragmentManager fm, String seminars, String attendedSeminarsId) {
             super(fm);
-            this.context = context;
             this.seminars = seminars;
             this.attendedSeminarsId = attendedSeminarsId;
             this.seminarsFragment = new SeminarsFragment();
@@ -234,18 +238,14 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
             this.setupAttendedSeminarsFragment();
         }
 
-        public SeminarsFragment getSeminarsFragment() {
-            return this.seminarsFragment;
-        }
-
         public AttendedSeminarsFragment getAttendedSeminarsFragment() {
             return this.attendedSeminarsFragment;
         }
 
         private void setupSeminarsFragment() {
             Bundle args = new Bundle();
-            args.putString("response", seminars);
-            args.putString("type", "student");
+            args.putString(getString(R.string.response), seminars);
+            args.putString(getString(R.string.type), getString(R.string.student));
 
             this.seminarsFragment.setArguments(args);
             this.seminarsFragment.setListener(StudentHomeActivity.this);
@@ -253,8 +253,8 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
 
         private void setupAttendedSeminarsFragment() {
             Bundle args = new Bundle();
-            args.putString("response", attendedSeminarsId);
-            args.putString("allSeminars", seminars);
+            args.putString(getString(R.string.response), attendedSeminarsId);
+            args.putString(getString(R.string.allSeminars), seminars);
 
             this.attendedSeminarsFragment.setArguments(args);
         }
@@ -283,7 +283,8 @@ public class StudentHomeActivity extends AppCompatActivity implements ClickListe
         }
 
         public View getTabView(int position) {
-            View tab = LayoutInflater.from(StudentHomeActivity.this).inflate(R.layout.custom_tab, null);
+            View tab = LayoutInflater.from(StudentHomeActivity.this)
+                    .inflate(R.layout.custom_tab, null);
             TextView tv = (TextView) tab.findViewById(R.id.custom_text);
             tv.setText(tabTitles[position]);
             return tab;
