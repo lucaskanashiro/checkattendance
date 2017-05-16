@@ -28,7 +28,6 @@ import br.usp.ime.checkattendance.utils.Parser;
 import br.usp.ime.checkattendance.utils.ServerCallback;
 
 public class ListAttendeesActivity extends AppCompatActivity {
-
     private String seminarId;
     private NetworkController networkController;
     private String attendeesId;
@@ -51,11 +50,9 @@ public class ListAttendeesActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            finish();
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -63,14 +60,14 @@ public class ListAttendeesActivity extends AppCompatActivity {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("List Attendees");
+            actionBar.setTitle(getString(R.string.list_attendees_title));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.seminarId = intent.getStringExtra("seminarId");
+        this.seminarId = intent.getStringExtra(getString(R.string.seminar_id));
     }
 
     private void setupViewPager() {
@@ -90,6 +87,10 @@ public class ListAttendeesActivity extends AppCompatActivity {
         }
     }
 
+    private void showMessage(String message, int duration) {
+        Toast.makeText(ListAttendeesActivity.this, message, duration).show();
+    }
+
     private void getAllStudentsData() {
         this.networkController.getAllStudents(this, new ServerCallback() {
             @Override
@@ -103,8 +104,7 @@ public class ListAttendeesActivity extends AppCompatActivity {
 
             @Override
             public void onError() {
-                String message = "Sorry, we cannot fetch students data";
-                Toast.makeText(ListAttendeesActivity.this, message, Toast.LENGTH_LONG).show();
+                showMessage(getString(R.string.cannot_fetch_students), Toast.LENGTH_LONG);
             }
         });
     }
@@ -124,9 +124,7 @@ public class ListAttendeesActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError() {
-
-            }
+            public void onError() {}
         });
     }
 
@@ -146,14 +144,10 @@ public class ListAttendeesActivity extends AppCompatActivity {
             this.setupFragments();
         }
 
-        public StudentsFragment getFragment() {
-            return this.fragment;
-        }
-
         private void setupFragmentArgs() {
             this.args = new Bundle();
-            args.putString("response", attendees);
-            args.putString("allStudents", students);
+            args.putString(getString(R.string.response), attendees);
+            args.putString(getString(R.string.allStudents), students);
         }
 
         private void setupFragments() {
@@ -168,7 +162,6 @@ public class ListAttendeesActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-
             switch (position) {
                 case 0:
                     return this.fragment;
@@ -183,7 +176,8 @@ public class ListAttendeesActivity extends AppCompatActivity {
         }
 
         public View getTabView(int position) {
-            View tab = LayoutInflater.from(ListAttendeesActivity.this).inflate(R.layout.custom_tab, null);
+            View tab = LayoutInflater.from(ListAttendeesActivity.this)
+                    .inflate(R.layout.custom_tab, null);
             TextView tv = (TextView) tab.findViewById(R.id.custom_text);
             tv.setText(tabTitles[position]);
             return tab;
