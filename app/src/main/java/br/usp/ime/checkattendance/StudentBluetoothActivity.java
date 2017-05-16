@@ -131,7 +131,7 @@ public class StudentBluetoothActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             this.mac_address_to_connect = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-            this.startThread();
+            this.setupThread();
         }
     }
 
@@ -156,8 +156,21 @@ public class StudentBluetoothActivity extends AppCompatActivity {
         };
     }
 
-    private void startThread() {
+    private void setupThread() {
         this.setupHandler();
+        this.getBluetoothAdapter();
+        this.getDevice();
+        this.getSocket();
+        this.connectSocket();
+        this.startThread();
+    }
+
+    private void startThread() {
+        this.thread = new ConnectedThread(this.socket, this.handler);
+        this.thread.start();
+    }
+
+    private void getBluetoothAdapter() {
         this.adapter = BluetoothAdapter.getDefaultAdapter();
 
         if (this.adapter == null) {
@@ -167,9 +180,13 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             setResult(NOT_REFRESH);
             finish();
         }
+    }
 
+    private void getDevice() {
         this.device = this.adapter.getRemoteDevice(this.mac_address_to_connect);
+    }
 
+    private void getSocket() {
         try {
             this.socket = this.device.createRfcommSocketToServiceRecord(this.appUUID);
         } catch (IOException e) {
@@ -178,7 +195,19 @@ public class StudentBluetoothActivity extends AppCompatActivity {
                     getString(R.string.cannot_get_socket),
                     Toast.LENGTH_SHORT).show();
         }
+    }
 
+    private void closeSocket() {
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            this.socket = null;
+        }
+    }
+
+    private void connectSocket() {
         try {
             this.socket.connect();
         } catch (IOException e) {
@@ -186,41 +215,31 @@ public class StudentBluetoothActivity extends AppCompatActivity {
             Toast.makeText(StudentBluetoothActivity.this,
                     getString(R.string.cannot_connect_socket),
                     Toast.LENGTH_SHORT).show();
-            try {
-                this.socket.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } finally {
-                this.socket = null;
-            }
+            this.closeSocket();
         }
-
-        this.thread = new ConnectedThread(this.socket, this.handler);
-        this.thread.start();
     }
 
     public class ConnectedThread extends Thread {
-
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
+        private InputStream mmInStream;
         private Handler handler;
         private BluetoothSocket socket;
 
         public ConnectedThread(BluetoothSocket socket, Handler handler) {
+            this.handler = handler;
+            this.socket = socket;
+            this.setInputStream();
+        }
+
+        private void setInputStream() {
             InputStream tmpIn = null;
-            OutputStream tmpOut = null;
 
             try {
-                tmpIn = socket.getInputStream();
-                tmpOut = socket.getOutputStream();
+                tmpIn = this.socket.getInputStream();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             this.mmInStream = tmpIn;
-            this.mmOutStream = tmpOut;
-            this.handler = handler;
-            this.socket = socket;
         }
 
         public void run() {
