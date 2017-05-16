@@ -38,7 +38,6 @@ import br.usp.ime.checkattendance.utils.ServerCallback;
  */
 
 public class SeminarsFragment extends Fragment {
-
     private ArrayList<Seminar> seminars;
     private String allSeminars;
     private String type;
@@ -65,18 +64,16 @@ public class SeminarsFragment extends Fragment {
 
     private void getBundleArgs() {
         this.args = getArguments();
-        this.allSeminars = args.getString("response");
-        this.type = args.getString("type");
+        this.allSeminars = args.getString(getString(R.string.response));
+        this.type = args.getString(getString(R.string.type));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         this.inflateLayout(inflater, container);
 
         this.seminars = Parser.parseStringResponse(this.allSeminars);
-
         this.adapter = new SeminarAdapter(this.seminars, this.type, this.listener);
         this.linearLayoutManager = new LinearLayoutManager(getActivity());
         this.setupRecyclerView();
@@ -85,11 +82,10 @@ public class SeminarsFragment extends Fragment {
     }
 
     private void inflateLayout(LayoutInflater inflater, ViewGroup container) {
-        if (this.type.equals("student")) {
+        if (this.type.equals(getString(R.string.student)))
             this.rootView = inflater.inflate(R.layout.fragment_seminars, container, false);
-        } else {
+        else
             this.rootView = inflater.inflate(R.layout.fragment_seminars_teacher, container, false);
-        }
     }
 
     private void setupRecyclerView() {
@@ -101,7 +97,6 @@ public class SeminarsFragment extends Fragment {
 
     public void setData(String seminars) {
         ArrayList<Seminar> allSeminars= Parser.parseStringResponse(seminars);
-
         SeminarAdapter adapter = new SeminarAdapter(allSeminars, this.type, this.listener);
         this.recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
