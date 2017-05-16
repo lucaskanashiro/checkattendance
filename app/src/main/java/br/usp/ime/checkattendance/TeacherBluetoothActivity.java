@@ -53,12 +53,19 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
         }
     }
 
+    private void closeActivity() {
+        if (this.thread != null) this.thread.cancel();
+        finish();
+    }
+
+    private void showMessage(String message, int duration) {
+        Toast.makeText(TeacherBluetoothActivity.this, message, duration).show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            this.thread.cancel();
-            finish();
-        }
+        if (item.getItemId() == android.R.id.home)
+            this.closeActivity();
 
         return super.onOptionsItemSelected(item);
     }
@@ -84,10 +91,8 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
         if (this.adapter != null && this.adapter.isEnabled())
             this.startThread();
         else if(this.adapter == null) {
-            Toast.makeText(TeacherBluetoothActivity.this,
-                    getString(R.string.bluetooth_not_supported),
-                    Toast.LENGTH_SHORT).show();
-            finish();
+            this.showMessage(getString(R.string.bluetooth_not_supported), Toast.LENGTH_SHORT);
+            this.closeActivity();
         } else if (! this.adapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
@@ -170,7 +175,6 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
                 }
             }
         }
-
 
         public void cancel() {
             try {
