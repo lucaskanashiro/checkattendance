@@ -23,21 +23,19 @@ import br.usp.ime.checkattendance.utils.Parser;
  */
 
 public class StudentsFragment extends android.support.v4.app.Fragment {
-
     private ArrayList<Student> students;
     private ArrayList<Student> attendeesStudents;
     private View rootView;
     private RecyclerView recyclerView;
     private StudentAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
-    private NetworkController networkController;
     private String studentsId;
     private String[] studentsIdArray;
     private String allStudents;
 
     public StudentsFragment() {
         this.students = new ArrayList<Student>();
-        this.networkController = new NetworkController();
+        this.attendeesStudents = new ArrayList<Student>();
     }
 
     @Override
@@ -45,24 +43,19 @@ public class StudentsFragment extends android.support.v4.app.Fragment {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        this.studentsId = args.getString("response");
-        this.allStudents = args.getString("allStudents");
-        this.attendeesStudents = new ArrayList<Student>();
-        this.students = new ArrayList<Student>();
+        this.studentsId = args.getString(getString(R.string.response));
+        this.allStudents = args.getString(getString(R.string.allStudents));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         this.inflateLayout(inflater, container);
         this.parseStudents();
         return this.rootView;
     }
 
     private void setupFragment() {
-        for(Student s : this.attendeesStudents)
-            Log.d("ATTENDEE", s.toString());
         this.adapter = new StudentAdapter(this.attendeesStudents);
         this.linearLayoutManager = new LinearLayoutManager(getActivity());
         this.setupRecyclerView();
@@ -110,9 +103,12 @@ public class StudentsFragment extends android.support.v4.app.Fragment {
             e.printStackTrace();
         }
         this.parseStudents();
+        this.setAdapterOnRecyclerView();
+        this.adapter.notifyDataSetChanged();
+    }
 
+    private void setAdapterOnRecyclerView() {
         StudentAdapter adapter = new StudentAdapter(this.attendeesStudents);
         this.recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
     }
 }
