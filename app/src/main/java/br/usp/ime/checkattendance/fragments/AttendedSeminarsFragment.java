@@ -32,26 +32,19 @@ import br.usp.ime.checkattendance.utils.ServerCallback;
  */
 
 public class AttendedSeminarsFragment extends Fragment {
-
     private ArrayList<Seminar> attendedSeminars;
     private String seminarsId;
     private String allSeminars;
-    private ClickListener listener;
     private View rootView;
     private RecyclerView recyclerView;
     private SeminarAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
-    private NetworkController networkController;
     private String[] seminarIdsArray;
     private ArrayList<Seminar> seminars;
 
     public AttendedSeminarsFragment() {
         this.attendedSeminars = new ArrayList<Seminar>();
-        this.listener = new ClickListener() {
-            @Override
-            public void onSeminarClick(Seminar seminar) {}
-        };
-        this.networkController = new NetworkController();
+        this.seminars = new ArrayList<Seminar>();
     }
 
     @Override
@@ -59,23 +52,21 @@ public class AttendedSeminarsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        this.seminarsId = args.getString("response");
-        this.allSeminars = args.getString("allSeminars");
-        this.attendedSeminars = new ArrayList<Seminar>();
-        this.seminars = new ArrayList<Seminar>();
+        this.seminarsId = args.getString(getString(R.string.response));
+        this.allSeminars = args.getString(getString(R.string.allSeminars));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         this.inflateLayout(inflater, container);
         this.parseAttendedSeminars();
         return this.rootView;
     }
 
     private void setupFragment() {
-        this.adapter = new SeminarAdapter(this.attendedSeminars, "student", this.listener);
+        this.adapter = new SeminarAdapter(this.attendedSeminars,
+                getString(R.string.student), null);
         this.linearLayoutManager = new LinearLayoutManager(getActivity());
         this.setupRecyclerView();
     }
@@ -122,10 +113,13 @@ public class AttendedSeminarsFragment extends Fragment {
             e.printStackTrace();
         }
         this.parseAttendedSeminars();
-
-        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars, "student", this.listener);
-        this.recyclerView.setAdapter(adapter);
+        this.setAdapterOnRecyclerView();
         adapter.notifyDataSetChanged();
     }
 
+    private void setAdapterOnRecyclerView() {
+        SeminarAdapter adapter = new SeminarAdapter(this.attendedSeminars,
+                getString(R.string.student), null);
+        this.recyclerView.setAdapter(adapter);
+    }
 }

@@ -39,12 +39,13 @@ public class SeminarAdapter extends RecyclerView.Adapter<SeminarAdapter.SeminarV
 
         public void bind(final Seminar seminar, final ClickListener listener) {
             this.mTextView.setText(seminar.getName());
-            this.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onSeminarClick(seminar);
-                }
-            });
+            if (listener != null)
+                this.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onSeminarClick(seminar);
+                    }
+                });
         }
     }
 
