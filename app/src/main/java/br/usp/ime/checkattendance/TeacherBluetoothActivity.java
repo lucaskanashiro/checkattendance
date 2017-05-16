@@ -22,17 +22,11 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
 
     private String seminarId;
     private String seminarName;
-    private int counter = 0;
 
-    private static final UUID appUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B1527");
+    private final String TAG = "TeacherBluetooth";
+    private final UUID appUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B1527");
 
-    private Handler handler;
     private BluetoothAdapter adapter;
-    private BluetoothDevice device;
-    private BluetoothServerSocket socket;
-    private final int MSG_TO_READ = 0;
-    private final int MSG_TOAST = 8;
-
     private AcceptThread thread;
 
     private TextView tv_seminar_name;
@@ -54,7 +48,7 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
         ActionBar actionBar = this.getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("Seminar authentication");
+            actionBar.setTitle(getString(R.string.seminar_auth));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -71,22 +65,26 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
 
     private void getSentData() {
         Intent intent = getIntent();
-        this.seminarId = intent.getStringExtra("id");
-        this.seminarName = intent.getStringExtra("name");
+        this.seminarId = intent.getStringExtra(getString(R.string.seminar_id));
+        this.seminarName = intent.getStringExtra(getString(R.string.seminar_name));
     }
 
     private void initializeUIComponents() {
         this.tv_seminar_name = (TextView) findViewById(R.id.tv_seminar_name_bluetooth_teacher);
-        this.tv_seminar_name.setText(this.seminarName + "\n\nYou are accepting connections to send the seminar's token for students via bluetooth");
+        this.tv_seminar_name.setText(this.seminarName +
+                getString(R.string.bluetooth_teacher_accepting_connections));
         this.tv_bluetooth_name = (TextView) findViewById(R.id.tv_bluetooth_name);
-        this.tv_bluetooth_name.setText("Attendees should connect with: " + this.adapter.getName());
+        this.tv_bluetooth_name.setText(getString(R.string.bluetooth_teacher_text_to_present_device) +
+                this.adapter.getName());
     }
 
     private void checkBluetoothState() {
         this.adapter=BluetoothAdapter.getDefaultAdapter();
 
         if(this.adapter == null) {
-            Toast.makeText(getBaseContext(), "Device does not support Bluetooth", Toast.LENGTH_SHORT).show();
+            Toast.makeText(TeacherBluetoothActivity.this,
+                    getString(R.string.bluetooth_not_supported),
+                    Toast.LENGTH_SHORT).show();
             finish();
         } else if (! this.adapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -100,66 +98,78 @@ public class TeacherBluetoothActivity extends AppCompatActivity {
     }
 
     private class AcceptThread extends Thread {
-        private final BluetoothServerSocket mmServerSocket;
+        private final BluetoothServerSocket serverSocket;
+        private OutputStream outputStream;
+        private BluetoothSocket socket;
 
         public AcceptThread() {
             BluetoothServerSocket tmp = null;
             try {
-                tmp = adapter.listenUsingRfcommWithServiceRecord("checkattendance", appUUID);
+                tmp = adapter.listenUsingRfcommWithServiceRecord(getString(R.string.app_name), appUUID);
             } catch (IOException e) {
-                Log.e("SOCKET", "Socket's listen() method failed", e);
+                Log.e(TAG, getString(R.string.cannot_get_socket), e);
             }
-            mmServerSocket = tmp;
+            this.serverSocket = tmp;
         }
 
         public void run() {
-            BluetoothSocket socket = null;
-            OutputStream mmOutStream = null;
-
             while (true) {
-                try {
-                    socket = mmServerSocket.accept();
-                } catch (IOException e) {
-                    Log.e("SOCKET", "Socket's accept() method failed", e);
-                    break;
-                }
+                boolean success = this.acceptConnections();
+                if (!success) break;
 
-                if (socket != null) {
-                    OutputStream tmpOut = null;
+                if (this.socket != null) {
+                    this.getOutputStream();
+                    this.writeData();
+                    this.cancel();
 
-                    try {
-                        tmpOut = socket.getOutputStream();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    mmOutStream = tmpOut;
-
-                    if(mmOutStream != null) {
-                        byte[] msgBuffer = seminarId.getBytes();
-                        try {
-                            mmOutStream.write(msgBuffer);
-                            Log.d("WRITING..", msgBuffer.toString());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    try {
-                        mmServerSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 }
             }
         }
 
+        private boolean acceptConnections() {
+            try {
+                this.socket = this.serverSocket.accept();
+                return true;
+            } catch (IOException e) {
+                Log.e(TAG, getString(R.string.cannot_accept_socket_connection), e);
+                return false;
+            }
+        }
+
+        private void getOutputStream() {
+            OutputStream tmpOut = null;
+
+            try {
+                tmpOut = this.socket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, getString(R.string.cannot_get_outputstream_socket), e);
+            }
+
+            this.outputStream = tmpOut;
+        }
+
+        private void writeData() {
+            if (this.outputStream != null) {
+                byte[] msgBuffer = seminarId.getBytes();
+                try {
+                    this.outputStream.write(msgBuffer);
+                    Log.d(TAG, getString(R.string.writing) + msgBuffer.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, getString(R.string.cannot_write_buffer_socket), e);
+                }
+            }
+        }
+
+
         public void cancel() {
             try {
-                mmServerSocket.close();
+                this.serverSocket.close();
             } catch (IOException e) {
-                Log.e("SOCKET", "Could not close the connect socket", e);
+                e.printStackTrace();
+                Log.e(TAG, getString(R.string.cannot_close_socket), e);
             }
         }
     }

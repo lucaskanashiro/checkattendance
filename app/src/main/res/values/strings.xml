@@ -1,4 +1,31 @@
 <resources>
     <string name="app_name">CheckAttendance</string>
     <string name="register"><u><b><i>Cadastre-se</i></b></u></string>
+
+    <string name="seminar_id">id</string>
+    <string name="seminar_name">name</string>
+    <string name="seminar_id_received">Seminar ID received: </string>
+    <string name="seminar_auth">Seminar authentication</string>
+
+    <string name="nusp">nusp</string>
+
+    <string name="confirm_attendance">Your attendance for this seminar was confirmed</string>
+    <string name="problem_attendance_confirmation">We had some problem during your attendance confirmation. Please, try again later</string>
+    <string name="different_seminar">The scanned seminar isn\'t the same that you selected. Try again</string>
+
+    <string name="network_issue">We had some network problem. Please, try again later</string>
+
+    <string name="cannot_close_socket">Could not close the connect socket</string>
+    <string name="cannot_write_buffer_socket">Could not send data via socket</string>
+    <string name="cannot_read_buffer_socket">Could not read data from socket</string>
+    <string name="cannot_get_outputstream_socket">Could not get OutputStream via socket</string>
+    <string name="cannot_get_inputstream_socket">Could not get InputStream via socket</string>
+    <string name="cannot_accept_socket_connection">Socket\'s accept() method failed</string>
+    <string name="cannot_connect_socket">Socket\'s connect() method failed</string>
+    <string name="cannot_get_socket">Socket\'s listen() method failed</string>
+    <string name="writing">Writing: </string>
+
+    <string name="bluetooth_teacher_accepting_connections">\n\nYou are accepting connections to send the seminar\'s token for students via bluetooth</string>
+    <string name="bluetooth_teacher_text_to_present_device">Attendees should connect with: </string>
+    <string name="bluetooth_not_supported">Device does not support Bluetooth</string>
 </resources>
