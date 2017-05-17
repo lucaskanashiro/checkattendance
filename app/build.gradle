@@ -33,4 +33,5 @@ dependencies {
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
     compile 'com.google.zxing:core:3.2.1'
     testCompile 'junit:junit:4.12'
+    testCompile 'org.json:json:20160212'
 }
